@@ -24,12 +24,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $data['title'] = "Dashboard";
-        $data['path'] = "Dashboard";
-        $data['path2'] = "Dashboard";
+        $data['title'] = "Home";
+        $data['breadcrumbs'] = [
+            ['label' => 'Home'],
+        ];
         
         $user = Auth::user();
-        $data['fullname'] = ucwords($user->name);
+        $data['name'] = ucwords($user->name);
 
         return view('home', $data);
     }

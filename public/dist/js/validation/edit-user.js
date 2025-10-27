@@ -1,9 +1,9 @@
-function openEditModal(id, username, name, positionId, roleName) {
+function openEditModal(id, username, name, locationCode, roleName) {
     document.getElementById("userId").value = id;
     document.getElementById("edit_username").value = username;
     document.getElementById("edit_name").value = name;
 
-    fillSelectOptions("edit_position", positions, positionId, "id", true); // pakai ID, label uppercase
+    fillSelectOptions("edit_location", locations, locationCode, "code", true); // pakai ID, label uppercase
     fillSelectOptions("edit_role", roles, roleName, "name", true); // pakai name, label uppercase
 }
 
@@ -36,7 +36,7 @@ $("#editModal").on("hidden.bs.modal", function () {
 $(function () {
     let isNameValid = true;
     let isUsernameValid = true;
-    let isPositionValid = true;
+    let isLocationValid = true;
     let isRoleValid = true;
     let debounceTimer;
 
@@ -88,8 +88,8 @@ $(function () {
         }
     }
 
-    function validatePosition() {
-        isPositionValid = $("#edit_position").val() !== "";
+    function validateLocation() {
+        isLocationValid = $("#edit_location").val() !== "";
         toggleSubmitButton();
     }
 
@@ -100,12 +100,12 @@ $(function () {
 
     function toggleSubmitButton() {
         let allFieldsValid =
-            isNameValid && isUsernameValid && isPositionValid && isRoleValid;
+            isNameValid && isUsernameValid && isLocationValid && isRoleValid;
 
         if (
             $("#edit_name").data("changed") ||
             $("#edit_username").data("changed") ||
-            $("#edit_position").data("changed") ||
+            $("#edit_location").data("changed") ||
             $("#edit_role").data("changed")
         ) {
             // If any of these fields changed, ensure validation is successful to enable the button
@@ -114,7 +114,7 @@ $(function () {
                 !(
                     isNameValid &&
                     isUsernameValid &&
-                    isPositionValid &&
+                    isLocationValid &&
                     isRoleValid
                 )
             );
@@ -133,9 +133,9 @@ $(function () {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(validateUsername, 500); // 500ms delay
     });
-    $("#edit_position").on("change", function () {
+    $("#edit_location").on("change", function () {
         $(this).data("changed", true);
-        validatePosition();
+        validateLocation();
     });
     $("#edit_role").on("change", function () {
         $(this).data("changed", true);

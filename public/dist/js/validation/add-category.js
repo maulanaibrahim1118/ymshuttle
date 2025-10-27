@@ -1,8 +1,5 @@
 $(function () {
     let isNameUnique = $("#name").val() ? true : false;
-    let isCriteriaValid =
-        Array.isArray($("#criterias").val()) &&
-        $("#criterias").val().length > 0;
     const categoryId = $("#id").val();
     let debounceTimer;
 
@@ -42,15 +39,8 @@ $(function () {
         }
     }
 
-    function validateCriteria() {
-        isCriteriaValid =
-            Array.isArray($("#criterias").val()) &&
-            $("#criterias").val().length > 0;
-        toggleSubmitButton();
-    }
-
     function toggleSubmitButton() {
-        const isFormValid = isNameUnique && isCriteriaValid;
+        const isFormValid = isNameUnique;
         $("#submitBtn").prop("disabled", !isFormValid);
     }
 
@@ -58,8 +48,6 @@ $(function () {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(validateName, 500); // 500ms delay
     });
-
-    $("#criterias").on("change", validateCriteria);
 
     toggleSubmitButton();
 });

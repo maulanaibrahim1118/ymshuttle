@@ -1,7 +1,7 @@
 $(document).ready(function () {
     let isNameValid = $("#name").val() ? true : false;
     let isUsernameUnique = $("#username").val() ? true : false;
-    let isPositionValid = $("#position").val() ? true : false;
+    let isLocationValid = $("#location").val() ? true : false;
     let isRoleValid = $("#role").val() ? true : false;
     const userId = $("#id").val();
     let debounceTimer;
@@ -58,8 +58,8 @@ $(document).ready(function () {
         }
     }
 
-    function validatePosition() {
-        isPositionValid = !!$("#position").val();
+    function validateLocation() {
+        isLocationValid = !!$("#location").val();
         toggleSubmitButton();
     }
 
@@ -70,7 +70,7 @@ $(document).ready(function () {
 
     function toggleSubmitButton() {
         let isFormValid =
-            isUsernameUnique && isNameValid && isPositionValid && isRoleValid;
+            isUsernameUnique && isNameValid && isLocationValid && isRoleValid;
         $("#submitBtn").prop("disabled", !isFormValid);
     }
 
@@ -79,7 +79,7 @@ $(document).ready(function () {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(validateUsername, 500); // 500ms delay
     });
-    $("#position").on("change", validatePosition);
+    $("#location").on("change", validateLocation);
     $("#role").on("change", validateRole);
 
     toggleSubmitButton();

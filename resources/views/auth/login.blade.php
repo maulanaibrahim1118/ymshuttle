@@ -27,12 +27,15 @@
 </head>
 <body>
     <div id="loadingOverlay">
-        <div class="wave-loader">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div class="loading-logo">
+            <img src="{{ asset('dist/img/logoym.png') }}?v={{ config('asset.version') }}" alt="Logo" />
         </div>
-        <div class="loading-text">Please Wait...</div>
+        {{-- <div class="wave-loader">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div> --}}
+        <div class="loading-text">Please Wait</div>
     </div>
     <div class="loading-bar" id="loadingBar"></div>
     <!--  Body Wrapper -->
@@ -75,7 +78,7 @@
                                                 </label>
                                                 </div>
                                             </div>
-                                            <button type="submit" class="btn btn-warning text-light w-100 rounded-2"><i class="fas fa-sign-in-alt me-2"></i> Login</button>
+                                            <button type="submit" class="btn btn-warning text-light w-100 rounded-3"><i class="fas fa-sign-in-alt me-2"></i> Login</button>
                                         </form>
                                     </div>
                                 </div>
