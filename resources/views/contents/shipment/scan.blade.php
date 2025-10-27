@@ -24,13 +24,19 @@ document.addEventListener("DOMContentLoaded", async function() {
     const beepSound = document.getElementById("beep-sound");
     let currentCameraId = null;
 
-    // Fungsi untuk memulai kamera ulang
     async function startCamera() {
         try {
             const devices = await Html5Qrcode.getCameras();
 
             if (devices && devices.length) {
-                currentCameraId = devices[0].id;
+                // Cari kamera belakang
+                const backCamera = devices.find(device =>
+                    device.label.toLowerCase().includes("back") ||
+                    device.label.toLowerCase().includes("rear")
+                );
+
+                // Jika ada kamera belakang → pakai itu, kalau tidak → ambil kamera pertama
+                currentCameraId = backCamera ? backCamera.id : devices[0].id;
 
                 await html5QrCode.start(
                     currentCameraId,
@@ -39,11 +45,9 @@ document.addEventListener("DOMContentLoaded", async function() {
                         qrbox: { width: 250, height: 250 }
                     },
                     (decodedText) => {
-                        // bunyikan beep
                         beepSound.currentTime = 0;
                         beepSound.play().catch(() => {});
 
-                        // stop scanner dan proses data
                         html5QrCode.stop().then(() => {
                             document.getElementById("result").innerText = "Memproses data...";
 
@@ -60,14 +64,13 @@ document.addEventListener("DOMContentLoaded", async function() {
                                 if (data.success) {
                                     window.location.href = data.redirect;
                                 } else {
-                                    // tampilkan alert dan restart kamera
                                     swal("Warning!", data.message, "warning", {
                                         timer: 3000,
                                         buttons: false
                                     }).then(() => {
                                         document.getElementById("result").innerText =
                                             "Point the camera at the QR Code...";
-                                        startCamera(); // inisialisasi ulang kamera
+                                        startCamera();
                                     });
                                 }
                             })
@@ -91,9 +94,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
-    // Jalankan pertama kali
     startCamera();
 });
-
 </script>
 @endsection
