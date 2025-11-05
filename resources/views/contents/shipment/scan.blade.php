@@ -65,6 +65,10 @@ document.addEventListener("DOMContentLoaded", async function() {
         if (!isManual) {
             beepSound.currentTime = 0;
             beepSound.play().catch(() => {});
+            // Tambahkan getaran selama 200ms
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
         }
 
         setScannerColor("#00FF00");
@@ -86,10 +90,16 @@ document.addEventListener("DOMContentLoaded", async function() {
             } else {
                 // pesan error disesuaikan
                 if (isManual) {
-                    manualError.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Shipment number not found.`;
+                    swal("Warning!", "Shipment number not found.", "warning", {
+                        timer: 3000,
+                    });
+                    // manualError.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Shipment number not found.`;
                 } else {
                     setScannerColor("#FF0000");
-                    resultEl.innerHTML = `<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Invalid QR Code!</span>`;
+                    swal("Warning!", "Invalid QR Code.", "warning", {
+                        timer: 3000,
+                    });
+                    // resultEl.innerHTML = `<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Invalid QR Code!</span>`;
                 }
 
                 setTimeout(() => {
