@@ -57,7 +57,7 @@ function renderCard(item) {
                         <h5 class="shipment-store-card text-muted mb-0 text-uppercase text-truncate">
                             <i class="fas fa-map-marker-alt text-danger me-1"></i>
                             <span class="fw-bolder text-dark">${
-                                item.receiver_location.name || "Unknown"
+                                item.receiver_location.clean_name || "Unknown"
                             }</span> |
                             ${item.category.name || "Unknown"}
                         </h5>

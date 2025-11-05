@@ -33,12 +33,12 @@
                             <div class="row">
                                 <div class="col-9 col-md-10 px-4">
                                     <h5 class="shipment-store-card">
-                                        <i class="fas fa-truck me-1"></i> Shipment Number:
+                                        <i class="fas fa-truck me-1"></i> No. Shipment:
                                         <span class="fw-bolder">{{ strtoupper($shipment->no_shipment) }}</span>
                                     </h5>
                                     <h5 class="shipment-store-card">
                                         <i class="fas fa-calendar-alt me-2"></i> Created At:
-                                        <span class="fw-bolder">{{ $shipment->created_at->format('d-M-Y H:i:s') }}</span>
+                                        <span class="fw-bolder">{{ strtoupper($shipment->created_at->format('d-M-Y H:i:s')) }}</span>
                                     </h5>
                                     <h5 class="shipment-store-card">
                                         <i class="fas fa-shapes me-2"></i> Category:
@@ -50,10 +50,15 @@
                                     </h5>
                                 </div>
                                 <div class="col-3 col-md-2 ps-0 text-end">
-                                    <img class="w-100 cursor-pointer" id="qrThumbnail"
-                                         src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
+                                    <img class="w-100 cursor-pointer" id="qrThumbnail" src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
                                     <div class="text-center mt-2">
-                                        <small class="text-muted">Scan QR Code</small>
+                                        {{-- <small class="text-muted">Scan QR Code</small> --}}
+                                        <a href="{{ route('shipments.print', $shipment->no_shipment) }}"
+                                        target="_blank"
+                                        onclick="openPrintPage(event, '{{ route('shipments.print', $shipment->no_shipment) }}')"
+                                        class="btn btn-sm btn-label-primary btn-round fw-bold w-100">
+                                            <i class="fas fa-print me-2"></i>Print
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -66,32 +71,32 @@
                     <div class="card card-warning bg-warning-gradient">
                         <div class="card-header pb-0">
                             <div class="row">
-                                <div class="col-8">
-                                    <h5 class="fw-bolder"><i class="fas fa-ellipsis-v me-2"></i> Destination</h5>
+                                <div class="col-6">
+                                    <h5 class="fw-bolder"><i class="fas fa-plane me-2"></i> Destination</h5>
                                 </div>
-                                <div class="col-4 ps-0 text-end">
+                                <div class="col-6 ps-0 text-end">
                                     <a href="#" class="text-light" data-bs-toggle="modal" data-bs-target="#trackingModal">
-                                        <i class="fas fa-route me-1"></i> Track Shipment
+                                        <i class="fas fa-route me-2"></i>Track Shipment
                                     </a>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body bubble-shadow">
                             <div class="row">
-                                <div class="col-12">
-                                    <h5 class="mb-0 op-8">
-                                        <i class="fas fa-dot-circle me-2"></i>
-                                        {{ ucwords(optional($shipment->sender_location)->name ?? '-') }}
-                                    </h5>
-                                    <div class="op-7">
+                                <div class="col-12 my-2">
+                                    <h6 class="fw-bolder mb-0 op-8">
+                                        <i class="fas fa-dot-circle me-1"></i>
+                                        Fr: {{ ucwords(optional($shipment->sender_location)->clean_name ?? '-') }}
+                                    </h6>
+                                    <div class="fs-7 op-7">
                                         {{ ucwords($shipment->sender_pic ?? '-') }}
                                     </div>
 
                                     <hr>
 
                                     <h5 class="fw-bolder mb-0">
-                                        <i class="fas fa-map-marker-alt me-2"></i>
-                                        {{ ucwords(optional($shipment->receiver_location)->name ?? '-') }}
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        To: {{ ucwords(optional($shipment->receiver_location)->clean_name ?? '-') }}
                                     </h5>
                                     <div class="fw-bold op-8">
                                         {{ ucwords($shipment->destination_pic ?? '-') }}
@@ -163,8 +168,8 @@
                                                         {{ $detail->item_name }}
                                                     </h7>
                                                     <h7 class="text-muted mb-0 text-truncate">
-                                                        {{ strtoupper($detail->label ?? '-') }} |
                                                         {{ number_format($detail->quantity, 0) }} {{ strtoupper($detail->uom) }}
+                                                        {{ $detail->label ? '| '.strtoupper($detail->label) : '' }}
                                                     </h7>
                                                 </div>
 
@@ -186,39 +191,20 @@
                             </div>
                         </div>
                         @if($shipment->status == '1' || $shipment->status == '2' || $shipment->status == '3')
-                        <div class="card-footer">
+                        <div class="card-footer py-3">
                             @if($shipment->status == '1' || $shipment->status == '3')
                             <div class="d-flex justify-content-between align-items-center p-2">
-                                <!-- Info di sisi kiri -->
-                                <div class="text-muted small">
-                                    <i class="fas fa-exclamation-triangle text-warning me-1"></i>
-                                    Re-check shipment before <strong>Collect</strong>.
-                                </div>
-
-                                <!-- Tombol buka modal -->
-                                <button type="button" class="btn btn-label-secondary btn-round" data-bs-toggle="modal" data-bs-target="#collectModal">
-                                    <i class="fas fa-database me-1"></i> Collect
+                                <button type="button" class="btn btn-label-secondary btn-round w-100" data-bs-toggle="modal" data-bs-target="#collectModal">
+                                    <i class="fas fa-database me-2"></i> Collect
                                 </button>
                             </div>
                             @endif
 
                             @if($shipment->status == '2')
                             <div class="d-flex justify-content-between align-items-center p-2">
-                                <!-- Notes di sisi kiri -->
-                                <div class="text-muted small">
-                                    <i class="fas fa-exclamation-triangle text-warning me-1"></i>
-                                    Re-check shipment before <strong>Send</strong>.
-                                </div>
-
-                                <!-- Tombol submit di sisi kanan -->
-                                <form action="{{ route('shipments.collect', ['noShipment' => encrypt($shipment->no_shipment)]) }}" method="POST">
-                                    @csrf
-                                    <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-label-primary btn-round">
-                                            <i class="fab fa-telegram-plane me-1"></i> Send
-                                        </button>
-                                    </div>
-                                </form>
+                                <button id="sendBtn" type="button" class="btn btn-label-primary btn-round w-100">
+                                    <i class="fab fa-telegram-plane me-2"></i> Send
+                                </button>
                             </div>
                             @endif
                         </div>
@@ -316,9 +302,6 @@
                         <div class="mb-3">
                             <textarea name="notes" id="notes" class="form-control" rows="5" placeholder="Add any notes before collecting... (optional)"></textarea>
                         </div>
-                        {{-- <p class="text-muted small mb-0">
-                            Please make sure all shipment details are correct before proceeding.
-                        </p> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light btn-round" data-bs-dismiss="modal">Cancel</button>
@@ -332,16 +315,96 @@
     </div>
 </div>
 
+<div class="modal fade" id="copiesModal" tabindex="-1" aria-labelledby="copiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm">
+            <div class="modal-header bg-light">
+                <h6 class="modal-title fw-bold" id="copiesModalLabel"><i class="fas fa-print me-2"></i> Print Shipment Label</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <label for="copiesInput" class="form-label fw-bold">Enter the number of labels you want to print:</label>
+                <input type="number" id="copiesInput" class="form-control" min="1" value="1" autofocus>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light btn-round" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmPrintBtn" class="btn btn-label-primary btn-round"><i class="fas fa-print me-1"></i> Print</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('customScripts')
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const qrThumbnail = document.getElementById("qrThumbnail");
+        
         qrThumbnail.addEventListener("click", () => {
             const qrModal = new bootstrap.Modal(document.getElementById("qrModal"));
             qrModal.show();
         });
+
+        const sendBtn = document.getElementById("sendBtn");
+
+        sendBtn.addEventListener("click", async function () {
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Sending...`;
+
+            try {
+                const response = await fetch("{{ route('shipments.collect', ['noShipment' => encrypt($shipment->no_shipment)]) }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // misalnya redirect ke halaman detail
+                    window.location.href = data.redirect ?? window.location.href;
+                } else {
+                    alert(data.message || "Gagal mengirim shipment.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Terjadi kesalahan saat mengirim data.");
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = `<i class="fab fa-telegram-plane me-1"></i> Send`;
+            }
+        });
+    });
+
+    // simpan URL sementara saat klik tombol print
+    let printBaseUrl = '';
+
+    function openPrintPage(event, baseUrl) {
+        event.preventDefault();
+        printBaseUrl = baseUrl;
+
+        // buka modal jumlah copy
+        const modal = new bootstrap.Modal(document.getElementById('copiesModal'));
+        modal.show();
+    }
+
+    // handle tombol "Print" di modal
+    document.getElementById('confirmPrintBtn').addEventListener('click', function () {
+        const copies = parseInt(document.getElementById('copiesInput').value);
+        if (!copies || isNaN(copies) || copies < 1) return;
+
+        const url = `${printBaseUrl}?copies=${copies}`;
+        window.open(url, '_blank', 'noopener');
+
+        // tutup modal setelah klik
+        const modalEl = document.getElementById('copiesModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        modalInstance.hide();
     });
 </script>
 @endsection

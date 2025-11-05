@@ -52,6 +52,8 @@ class ShipmentController extends Controller
             ->orderBy('name', 'ASC')
             ->get();
 
+        $data['uoms'] = DB::table('uoms')->pluck('name')->sort()->values(); 
+
         return view('contents.shipment.create', $data);
     }
 
@@ -67,7 +69,7 @@ class ShipmentController extends Controller
             'destination'       => 'required|string|max:5',
             'destination_pic'   => 'nullable|string|max:50',
             'category_id'       => 'required|integer',
-            'is_asset'          => 'required|in:0,1',
+            'packing'           => 'nullable|string|max:50',
             'handling_level'    => 'required|in:1,2',
             'shipment_by'       => 'required|in:1,2,3',
             'items'             => 'required|array|min:1',
@@ -81,7 +83,7 @@ class ShipmentController extends Controller
 
         $cleaned = Cleaner::cleanAll($request->only([
             'sender_pic', 'destination', 'destination_pic', 'category_id',
-            'is_asset', 'handling_level', 'shipment_by', 'notes'
+            'packing', 'handling_level', 'shipment_by', 'notes'
         ]));
 
         $destinationLoc = Location::where('code', $cleaned['destination'])->first();
@@ -106,7 +108,7 @@ class ShipmentController extends Controller
             'sender_pic'        => strtolower($cleaned['sender_pic']),
             'destination'       => $cleaned['destination'],
             'destination_pic'   => strtolower($cleaned['destination_pic'] ?? ''),
-            'is_asset'          => $cleaned['is_asset'],
+            'packing'           => $cleaned['packing'],
             'handling_level'    => $cleaned['handling_level'],
             'shipment_by'       => $cleaned['shipment_by'],
             'is_branch'         => $isBranch,
@@ -225,6 +227,35 @@ class ShipmentController extends Controller
         $data['qrCode'] = base64_encode($qr->getString());
 
         return view('contents.shipment.show', $data);
+    }
+
+    public function print($noShipment)
+    {
+        $copies = request()->get('copies', 1); // default 1 jika tidak diisi
+
+        $data['shipment'] = Shipment::with([
+            'category',
+            'shipment_detail',
+            'shipment_ledger',
+            'sender_location',
+            'receiver_location',
+            'creator'
+        ])->where('no_shipment', $noShipment)->firstOrFail();
+
+        $qr = Builder::create()
+            ->writer(new PngWriter())
+            ->data($noShipment)
+            ->size(300)
+            ->margin(10)
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->logoPath(public_path('dist/img/logoym.jpg'))
+            ->logoResizeToWidth(85)
+            ->build();
+
+        $data['qrCode'] = base64_encode($qr->getString());
+        $data['copies'] = (int) $copies;
+
+        return view('contents.shipment.print', $data);
     }
 
     public function scanPage()

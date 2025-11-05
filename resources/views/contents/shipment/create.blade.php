@@ -69,8 +69,16 @@
                                         <div class="col-12 col-md-4 px-2">
                                             <input type="text" name="items[0][name]" class="form-control text-uppercase alert-warning" placeholder="Item Name*" required>
                                         </div>
+                                        <div class="col-6 col-md-1 px-2">
+                                            <input type="number" name="items[0][qty]" class="form-control text-uppercase alert-warning" placeholder="Qty*" required>
+                                        </div>
                                         <div class="col-6 col-md-2 px-2">
-                                            <input type="text" name="items[0][label]" class="form-control text-uppercase alert-warning" placeholder="Label Number">
+                                            <select name="items[0][uom]" class="form-control select2 alert-warning text-uppercase" required>
+                                                <option value="" disabled selected>UOM*</option>
+                                                @foreach($uoms as $uom)
+                                                <option value="{{ $uom }}">{{ strtoupper($uom) }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-6 col-md-2 px-2">
                                             <select name="items[0][condition]" class="form-control select2 alert-warning text-uppercase" required>
@@ -79,11 +87,8 @@
                                                 <option value="broken">BROKEN</option>
                                             </select>
                                         </div>
-                                        <div class="col-6 col-md-1 px-2">
-                                            <input type="number" name="items[0][qty]" class="form-control text-uppercase alert-warning" placeholder="Qty*" required>
-                                        </div>
                                         <div class="col-6 col-md-2 px-2">
-                                            <input type="text" name="items[0][uom]" class="form-control text-uppercase alert-warning" placeholder="UOM*" required>
+                                            <input type="text" name="items[0][label]" class="form-control text-uppercase alert-warning" placeholder="No Label (optional)">
                                         </div>
                                         <div class="col-12 col-md-1 px-2 d-flex justify-content-end">
                                             <button type="button" class="btn btn-label-danger btn-sm deleteRow w-100"><i class="fas fa-trash-alt me-1"></i> Delete</button>
@@ -93,23 +98,19 @@
                             </div>
 
                             <button type="button" id="addRow" class="btn btn-label-primary btn-sm mt-2"><i class="fas fa-plus me-1"></i> Add Item</button>
-                        </div>
 
-                        <div class="border-top mb-3 mb-0"></div>
+                            <div class="border-top my-3"></div>
 
-                        <div class="form-group col-md-3 mt-0">
-                            <label class="form-label">Item Type*</label>
-                            <div id="handlingGroup" class="selectgroup selectgroup-warning w-100">
-                                <label class="selectgroup-item">
-                                    <input type="radio" name="is_asset" value="0" class="selectgroup-input" />
-                                    <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-cube me-2"></i>Non Asset</span>
-                                </label>
-                                <label class="selectgroup-item">
-                                    <input type="radio" name="is_asset" value="1" class="selectgroup-input" />
-                                    <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-gem me-2"></i>Asset</span>
-                                </label>
+                            <div class="form-group col-md-2 py-0">
+                                <label class="form-label">Item Packing</label>
+                                <div class="input-group mb-3">
+                                    <input type="number" name="packing" id="packing" class="form-control alert-warning"/>
+                                    <span class="input-group-text" id="basic-addon2"><i class="fas fa-box me-2"></i> Carton</span>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="border-top mb-3 my-0"></div>
 
                         <div class="form-group col-md-3 mt-0">
                             <label class="form-label">Handling Level*</label>
@@ -178,16 +179,7 @@
 </script>
 @endif
 <script>
-    
+    var uoms = @json($uoms);
 </script>
-{{-- <script>
-    const claimPage = {
-        isEdit: {{ isset($benefit) ? 'true' : 'false' }},
-        selectedemployeeNumber: @json($benefit->employee_number ?? null),
-        selectedClaimType: @json($benefit->claim_type_id ?? null),
-        selectedClaimFor: @json($benefit->claim_for ?? null)
-    };
-</script> --}}
-{{-- <script src="{{ asset('dist/js/validation/transaction-rule.js') }}?v={{ config('asset.version') }}"></script> --}}
 <script src="{{ asset('dist/js/validation/create-shipment.js') }}?v={{ config('asset.version') }}"></script>
 @endsection

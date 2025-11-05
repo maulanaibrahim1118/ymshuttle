@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             RolePermissionSeeder::class,
             SuperadminUserSeeder::class,
+            UomSeeder::class,
         ];
 
         foreach ($seeders as $seeder) {

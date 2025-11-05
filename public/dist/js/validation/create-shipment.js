@@ -1,73 +1,76 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("items_container");
     let rowIdx = 1;
 
-    // Add Row
     document.getElementById("addRow").addEventListener("click", function () {
-        let container = document.getElementById("items_container");
-
-        let newRow = document.createElement("div");
+        const newRow = document.createElement("div");
         newRow.classList.add("item-row", "border", "rounded", "p-3", "mb-2");
+
+        // bikin dropdown UOM dari array uoms global
+        const uomOptions = uoms
+            .map(
+                (uom) => `<option value="${uom}">${uom.toUpperCase()}</option>`
+            )
+            .join("");
+
         newRow.innerHTML = `
-                <div class="row g-3 px-2">
-                    <div class="col-12 col-md-4 px-2">
-                        <input type="text" name="items[${rowIdx}][name]" class="form-control text-uppercase alert-warning" placeholder="Item Name*" required>
-                    </div>
-                    <div class="col-6 col-md-2 px-2">
-                        <input type="text" name="items[${rowIdx}][label]" class="form-control text-uppercase alert-warning" placeholder="Label Number">
-                    </div>
-                    <div class="col-6 col-md-2 px-2">
-                        <select name="items[${rowIdx}][condition]" class="form-control select2 alert-warning text-uppercase" required>
-                            <option value="" disabled selected>CONDITION*</option>
-                            <option value="good">GOOD</option>
-                            <option value="broken">BROKEN</option>
-                        </select>
-                    </div>
-                    <div class="col-6 col-md-1 px-2">
-                        <input type="number" name="items[${rowIdx}][qty]" class="form-control text-uppercase alert-warning" placeholder="Qty*" required>
-                    </div>
-                    <div class="col-6 col-md-2 px-2">
-                        <input type="text" name="items[${rowIdx}][uom]" class="form-control text-uppercase alert-warning" placeholder="UOM*" required>
-                    </div>
-                    <div class="col-12 col-md-1 px-2 d-flex justify-content-end">
-                        <button type="button" class="btn btn-label-danger btn-sm deleteRow w-100"><i class="fas fa-trash-alt me-1"></i> Delete</button>
-                    </div>
+            <div class="row g-3 px-2">
+                <div class="col-12 col-md-4 px-2">
+                    <input type="text" name="items[${rowIdx}][name]" class="form-control text-uppercase alert-warning" placeholder="Item Name*" required>
                 </div>
-            `;
+                <div class="col-6 col-md-1 px-2">
+                    <input type="number" name="items[${rowIdx}][qty]" class="form-control text-uppercase alert-warning" placeholder="Qty*" required>
+                </div>
+                <div class="col-6 col-md-2 px-2">
+                    <select name="items[${rowIdx}][uom]" class="form-select select2 alert-warning text-uppercase" required>
+                        <option value="" disabled selected>UOM*</option>
+                        ${uomOptions}
+                    </select>
+                </div>
+                <div class="col-6 col-md-2 px-2">
+                    <select name="items[${rowIdx}][condition]" class="form-select select2 alert-warning text-uppercase" required>
+                        <option value="" disabled selected>CONDITION*</option>
+                        <option value="good">GOOD</option>
+                        <option value="broken">BROKEN</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2 px-2">
+                    <input type="text" name="items[${rowIdx}][label]" class="form-control text-uppercase alert-warning" placeholder="No Label (optional)">
+                </div>
+                <div class="col-12 col-md-1 px-2 d-flex justify-content-end">
+                    <button type="button" class="btn btn-label-danger btn-sm deleteRow w-100">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </button>
+                </div>
+            </div>
+        `;
 
         container.appendChild(newRow);
         initSelect2(newRow);
         rowIdx++;
     });
 
-    // Delete Row
-    document
-        .getElementById("items_container")
-        .addEventListener("click", function (e) {
-            if (e.target && e.target.classList.contains("deleteRow")) {
-                let rows = document.querySelectorAll(
-                    "#items_container .item-row"
+    container.addEventListener("click", (e) => {
+        if (e.target.closest(".deleteRow")) {
+            const rows = container.querySelectorAll(".item-row");
+            if (rows.length > 1) {
+                e.target.closest(".item-row").remove();
+            } else {
+                $.notify(
+                    {
+                        icon: "icon-bell",
+                        title: "Warning",
+                        message: "There must be at least 1 item!",
+                    },
+                    {
+                        type: "warning",
+                        placement: { from: "top", align: "right" },
+                        delay: 1000,
+                    }
                 );
-                if (rows.length > 1) {
-                    e.target.closest(".item-row").remove();
-                } else {
-                    $.notify(
-                        {
-                            icon: "icon-bell",
-                            title: "Warning",
-                            message: "There must be at least 1 item!",
-                        },
-                        {
-                            type: "warning",
-                            placement: {
-                                from: "top",
-                                align: "right",
-                            },
-                            delay: 1000,
-                        }
-                    );
-                }
             }
-        });
+        }
+    });
 
     const config = {
         handling_level: {
@@ -159,7 +162,6 @@ function validateShipmentForm(showError = true) {
     });
 
     // --- Validasi radio button ---
-    validateRadioGroup("is_asset", showError);
     validateRadioGroup("shipment_by", showError);
     validateRadioGroup("handling_level", showError);
 }
@@ -245,7 +247,7 @@ $("#createShipment").on("submit", function (e) {
 // ==================== FIELD CHANGE HANDLER ====================
 $(document).on(
     "change input",
-    "#createShipment [required], .select2-hidden-accessible, input[name='is_asset'], input[name='shipment_by'], input[name='handling_level']",
+    "#createShipment [required], .select2-hidden-accessible, input[name='shipment_by'], input[name='handling_level']",
     function () {
         const $field = $(this);
         const name = $field.attr("name");

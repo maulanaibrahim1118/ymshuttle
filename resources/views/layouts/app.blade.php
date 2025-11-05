@@ -51,7 +51,7 @@
                 </button>
             </div>
 
-            <div id="marginFloatingMenu" class="py-5" hidden></div>
+            <div id="marginFloatingMenu" style="padding:27px 0px;" hidden></div>
 
             <footer class="footer" id="fade-in">
                 <div class="container-fluid d-flex justify-content-between">

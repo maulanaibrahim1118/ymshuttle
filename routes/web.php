@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/shipments/scan', 'ShipmentController@scanPage')->name('shipments.scan');
         Route::post('/shipments/scan', 'ShipmentController@scanProcess')->name('shipments.scan.process');
         Route::post('/shipments/collect/{noShipment}', 'ShipmentController@collect')->name('shipments.collect');
+        Route::get('/shipments/print/{noShipment}', 'ShipmentController@print')->name('shipments.print');
         Route::get('/ajax/list-shipments', 'ShipmentController@list')->name('shipments.list');
 
         Route::get('/setting-users', 'UserController@index')->name('users.index')->middleware('permission:user-view');
