@@ -102,9 +102,11 @@ document.addEventListener("DOMContentLoaded", async function() {
                     window.location.href = data.redirect;
                 });
             } else {
+                const message = data.message || 'Shipment not available.';
+
                 // pesan error disesuaikan
                 if (isManual) {
-                    swal("Warning!", "Shipment number not found.", "warning", {
+                    swal("Warning!", message, "warning", {
                         timer: 1500,
                         button:false
                     });
@@ -114,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                     // manualError.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Shipment number not found.`;
                 } else {
                     setScannerColor("#FF0000");
-                    swal("Warning!", "Invalid QR Code.", "warning", {
+                    swal("Warning!", message, "warning", {
                         timer: 1500,
                         button:false
                     });

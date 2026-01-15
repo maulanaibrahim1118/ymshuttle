@@ -508,7 +508,7 @@ class ShipmentController extends Controller
         if (!$shipment) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid QR Code!'
+                'message' => 'Shipment not available.'
             ]);
         }
 
@@ -519,7 +519,7 @@ class ShipmentController extends Controller
         ) {
             return response()->json([
                 'success' => false,
-                'message' => 'Shipment is not available.'
+                'message' => 'Shipment is not ready yet.'
             ]);
         }
 
