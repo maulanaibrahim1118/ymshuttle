@@ -99,6 +99,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         .then(data => {
             if (data.success) {
                 html5QrCode.stop().then(() => {
+                    inputEl.value = "";
                     window.location.href = data.redirect;
                 });
             } else {
