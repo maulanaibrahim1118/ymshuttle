@@ -136,7 +136,7 @@
                                     <input type="radio" name="shipment_by" value="2" class="selectgroup-input" />
                                     <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-truck me-2"></i>Shuttle</span>
                                 </label>
-                                <label class="selectgroup-item">
+                                <label class="selectgroup-item" {{ $area == 'ho' ? '' : 'hidden' }}>
                                     <input type="radio" name="shipment_by" value="3" class="selectgroup-input" />
                                     <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-user-secret me-2"></i>Messenger</span>
                                 </label>

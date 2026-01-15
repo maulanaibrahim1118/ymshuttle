@@ -59,8 +59,7 @@
 
                         <div class="form-group col-md-4 mt-0">
                             <label class="form-label">Destination PIC*</label>
-                            <input type="text"
-                                   name="destination_pic"
+                            <input type="text" name="destination_pic"
                                    class="form-control text-uppercase alert-warning"
                                    value="{{ old('destination_pic', $shipment->destination_pic) }}"
                                    required>
@@ -114,9 +113,7 @@
                                         </div>
 
                                         <div class="col-md-2 px-2">
-                                            <select name="items[{{ $i }}][uom]"
-                                                    class="form-control select2 alert-warning"
-                                                    required>
+                                            <select name="items[{{ $i }}][uom]" class="form-control select2 alert-warning" required>
                                                 @foreach($uoms as $uom)
                                                     <option value="{{ $uom }}"
                                                         {{ (is_array($item) ? $item['uom'] : $item->uom) == $uom ? 'selected' : '' }}>
@@ -127,9 +124,7 @@
                                         </div>
 
                                         <div class="col-md-2 px-2">
-                                            <select name="items[{{ $i }}][condition]"
-                                                    class="form-control select2 alert-warning"
-                                                    required>
+                                            <select name="items[{{ $i }}][condition]" class="form-control select2 alert-warning" required>
                                                 <option value="good" {{ (is_array($item) ? $item['condition'] : $item->condition) == 'good' ? 'selected' : '' }}>GOOD</option>
                                                 <option value="broken" {{ (is_array($item) ? $item['condition'] : $item->condition) == 'broken' ? 'selected' : '' }}>BROKEN</option>
                                             </select>
@@ -174,21 +169,13 @@
                             <label class="form-label">Handling Level*</label>
                             <div id="handlingGroup" class="selectgroup w-100">
                                 <label class="selectgroup-item">
-                                    <input type="radio"
-                                        name="handling_level"
-                                        value="1"
-                                        class="selectgroup-input"
-                                        {{ old('handling_level', $shipment->handling_level) == 1 ? 'checked' : '' }} />
+                                    <input type="radio" name="handling_level" value="1" class="selectgroup-input" {{ old('handling_level', $shipment->handling_level) == 1 ? 'checked' : '' }} />
                                     <span class="selectgroup-button selectgroup-button-icon">
                                         <i class="fas fa-check-circle me-2"></i>Normal
                                     </span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="radio"
-                                        name="handling_level"
-                                        value="2"
-                                        class="selectgroup-input"
-                                        {{ old('handling_level', $shipment->handling_level) == 2 ? 'checked' : '' }} />
+                                    <input type="radio" name="handling_level" value="2" class="selectgroup-input" {{ old('handling_level', $shipment->handling_level) == 2 ? 'checked' : '' }} />
                                     <span class="selectgroup-button selectgroup-button-icon">
                                         <i class="fas fa-exclamation-triangle me-2"></i>Fragile
                                     </span>
@@ -200,31 +187,19 @@
                             <label class="form-label">Delivery By*</label>
                             <div id="shipmentGroup" class="selectgroup selectgroup-warning w-100">
                                 <label class="selectgroup-item">
-                                    <input type="radio"
-                                        name="shipment_by"
-                                        value="1"
-                                        class="selectgroup-input"
-                                        {{ old('shipment_by', $shipment->shipment_by) == 1 ? 'checked' : '' }} />
+                                    <input type="radio" name="shipment_by" value="1" class="selectgroup-input" {{ old('shipment_by', $shipment->shipment_by) == 1 ? 'checked' : '' }} />
                                     <span class="selectgroup-button selectgroup-button-icon">
                                         <i class="fas fa-user me-2"></i>Personally
                                     </span>
                                 </label>
-                                <label class="selectgroup-item">
-                                    <input type="radio"
-                                        name="shipment_by"
-                                        value="2"
-                                        class="selectgroup-input"
-                                        {{ old('shipment_by', $shipment->shipment_by) == 2 ? 'checked' : '' }} />
+                                <label class="selectgroup-item" {{ $area == 'ho' ? '' : 'hidden' }}>
+                                    <input type="radio" name="shipment_by" value="2" class="selectgroup-input" {{ old('shipment_by', $shipment->shipment_by) == 2 ? 'checked' : '' }} />
                                     <span class="selectgroup-button selectgroup-button-icon">
                                         <i class="fas fa-truck me-2"></i>Shuttle
                                     </span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="radio"
-                                        name="shipment_by"
-                                        value="3"
-                                        class="selectgroup-input"
-                                        {{ old('shipment_by', $shipment->shipment_by) == 3 ? 'checked' : '' }} />
+                                    <input type="radio" name="shipment_by" value="3" class="selectgroup-input" {{ old('shipment_by', $shipment->shipment_by) == 3 ? 'checked' : '' }} />
                                     <span class="selectgroup-button selectgroup-button-icon">
                                         <i class="fas fa-user-secret me-2"></i>Messenger
                                     </span>
@@ -234,14 +209,11 @@
 
                         <div class="form-group col-md-12 mt-0">
                             <label class="form-label">Notes</label>
-                            <textarea name="notes"
-                                      class="form-control text-uppercase alert-warning"
-                                      rows="5">{{ old('notes', $shipment->notes) }}</textarea>
+                            <textarea name="notes" class="form-control text-uppercase alert-warning" rows="5">{{ old('notes', $shipment->notes) }}</textarea>
                         </div>
 
                         <div class="col-md-12">
-                            <button type="submit"
-                                    class="btn btn-label-primary btn-round float-end">
+                            <button type="submit" class="btn btn-label-primary btn-round float-end">
                                 <i class="fas fa-save me-1"></i> Update
                             </button>
                         </div>

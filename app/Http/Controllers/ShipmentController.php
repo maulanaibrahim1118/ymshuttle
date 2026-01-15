@@ -47,13 +47,17 @@ class ShipmentController extends Controller
             ['label' => 'Create'],
         ];
 
+        $user = Auth::user();
+        $userLocation = Location::where('code', $user->location_code)->first();
+        $data['area'] = $userLocation->area ?? 'unknown';
+
         $data['categories'] = DB::table('categories')->select('id', 'name')->orderBy('name', 'ASC')->get();
         $data['locations'] = Location::select('code', 'site', 'name')
             ->whereNotIn('code', [Auth::user()->location_code])
             ->orderBy('name', 'ASC')
             ->get();
 
-        $data['uoms'] = DB::table('uoms')->pluck('name')->sort()->values(); 
+        $data['uoms'] = DB::table('uoms')->pluck('name')->sort()->values();
 
         return view('contents.shipment.create', $data);
     }
@@ -266,6 +270,10 @@ class ShipmentController extends Controller
             ['label' => 'Shipment', 'url' => '/shipments'],
             ['label' => 'Edit'],
         ];
+
+        $user = Auth::user();
+        $userLocation = Location::where('code', $user->location_code)->first();
+        $data['area'] = $userLocation->area ?? 'unknown';
 
         // PAKAI QUERY YANG SAMA
         $data['shipment'] = $this->getShipmentDetail($id);
