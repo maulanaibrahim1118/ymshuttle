@@ -15,6 +15,10 @@ class CreateShippingNotesTable extends Migration
     {
         Schema::create('shipping_notes', function (Blueprint $table) {
             $table->id();
+            $table->string('no_shipment', 15)->index();
+            $table->text('notes');
+            $table->string('created_by', 40);
+            $table->string('updated_by', 40);
             $table->timestamps();
         });
     }

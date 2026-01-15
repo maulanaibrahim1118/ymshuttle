@@ -221,9 +221,9 @@
                     ][$dc] ?? 'bg-dark';
                 @endphp
 
-                <div class="dc-support-side {{ $bgClass }}">
+                <div class="dc-support-side {{ $shipment->shipment_by == '2' ? $bgClass : 'bg-dark' }}">
                     <div class="dc-support-text">
-                        Via {{ $dc }}
+                        {{ $shipment->shipment_by == '2' ? $dc : '' }}
                     </div>
                 </div>
             </div>

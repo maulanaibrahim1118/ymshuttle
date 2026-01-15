@@ -17,10 +17,10 @@ $(document).ready(function () {
 
     function validateUsername() {
         let username = $("#username").val();
-        username = filterNonNumericInput(username);
+        // username = filterNonNumericInput(username);
         $("#username").val(username);
 
-        if (username !== "" && /^[0-9a-zA-Z]{1,10}$/.test(username)) {
+        if (username !== "") {
             $.ajax({
                 url: "/ajax/check-unique-username",
                 type: "GET",

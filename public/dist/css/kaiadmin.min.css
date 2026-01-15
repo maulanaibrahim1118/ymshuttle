@@ -8928,7 +8928,7 @@ label.error {
         flex-direction: column;
         align-items: normal;
         position: relative;
-        min-height: 43px;
+        min-height: 0px;
         justify-content: center;
     }
     .main-panel .page-header .breadcrumbs {
@@ -8966,6 +8966,9 @@ label.error {
         padding-top: 5px;
     }
     .page-header > h3 {
+        display: none;
+    }
+    .page-header > ul {
         display: none;
     }
     .page-header .breadcrumbs {
@@ -10802,4 +10805,48 @@ table.table-sm tr table.table-sm td {
 .timeline-content {
     width: 70%;
     flex-grow: 1;
+}
+.shipment-card {
+    transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background-color 0.12s ease;
+}
+/* keadaan normal */
+.shipment-card {
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+/* hover → mulai ditekan */
+.shipment-card:hover {
+    transform: translateY(2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+/* aktif (klik) → benar-benar ditekan */
+.shipment-card:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+/* efek garis kiri tetap jalan */
+.shipment-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    border-radius: 4px 0 0 4px;
+    transition: background 0.2s ease;
+}
+.shipment-card:hover::before {
+    background: #ffa534;
+}
+/* sentuhan hover ringan */
+.ripple-card:hover {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+.chevron-move {
+    display: inline-flex;
+    transition: transform 0.25s ease;
+}
+.shipment-card:hover .chevron-move {
+    transform: translateX(5px) scale(1.25);
 }

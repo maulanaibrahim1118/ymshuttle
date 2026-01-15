@@ -26,6 +26,12 @@ class Location extends Model
     
     public function getCleanNameAttribute()
     {
-        return preg_replace('/^(yogya|yomart)\s*/i', '', $this->name);
+        if (preg_match('/^(yogya|yomart)\b/i', $this->name)) {
+            $cleanName = preg_replace('/^(yogya|yomart)\s*/i', '', $this->name);
+
+            return $this->site . ' - ' . $cleanName;
+        }
+
+        return $this->name;
     }
 }

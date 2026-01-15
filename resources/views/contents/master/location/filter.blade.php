@@ -20,7 +20,7 @@
                         <select name="location_id" class="form-select select2" id="location_id">
                             <option selected value="">ALL LOCATIONS</option>
                             @foreach ($locations as $location)
-                            <option value="{{ encrypt($location->id) }}">{{ strtoupper($location->name) }}</option>
+                            <option value="{{ encrypt($location->id) }}">{{ strtoupper($location->clean_name) }}</option>
                             @endforeach
                         </select>
                     </div>

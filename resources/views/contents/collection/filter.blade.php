@@ -28,7 +28,7 @@
                         <select name="sender" class="form-select select2" id="sender">
                             <option selected value="">ALL SENDERS</option>
                             @foreach ($locations as $location)
-                            <option value="{{ encrypt($location->code) }}">{{ strtoupper($location->clean_name) }}</option>
+                            <option value="{{ encrypt($location->code) }}">{{ strtoupper($location->name) }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -36,18 +36,8 @@
                         <select name="destination" class="form-select select2" id="destination">
                             <option selected value="">ALL DESTINATIONS</option>
                             @foreach ($locations as $location)
-                            <option value="{{ encrypt($location->code) }}">{{ strtoupper($location->clean_name) }}</option>
+                            <option value="{{ encrypt($location->code) }}">{{ strtoupper($location->name) }}</option>
                             @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group col-md-3">
-                        <select name="status" class="form-select select2" id="status">
-                            <option selected value="">ALL STATUSES</option>
-                            <option value="1">CREATED</option>
-                            <option value="2">ON LOADING</option>
-                            <option value="3">ON DELIVERY</option>
-                            <option value="4">DELIVERED</option>
-                            <option value="5">CANCELLED</option>
                         </select>
                     </div>
                     <div class="form-group col-md-3">

@@ -17,12 +17,12 @@ class CreateShipmentLedgersTable extends Migration
             $table->id();
             $table->string('no_shipment', 15)->index();
             $table->string('description', 255);
-            $table->enum('status', [1, 2, 3, 4, 5, 6])->default(1); // New, Loading, Delivery, Delivered, Received, Cancelled
+            $table->enum('status', [1, 2, 3, 4, 5, 6])->default(1); // Create, Sent, Collected, Delivered, Received, Cancelled
             $table->string('status_actor', 50);
             $table->string('location_point', 50);
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
-            $table->text('note')->nullable();
+            $table->text('notes')->nullable();
             $table->string('img_path', 255)->nullable();
             $table->string('created_by', 40);
             $table->string('updated_by', 40);

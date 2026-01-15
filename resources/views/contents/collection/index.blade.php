@@ -6,7 +6,7 @@
     
     <div class="row">
         <div class="col-12">
-            @include('contents.shipment.filter')
+            @include('contents.collection.filter')
 
             <div class="card card-stats card-round" id="shipmentCard">
                 <div class="card-body pb-0">
@@ -14,7 +14,7 @@
                         <div class="accordion-item mx-2">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                    <h5 class="card-title mb-0"><i class="fas fa-box me-3"></i>{{ $title }}</h5>
+                                    <h5 class="card-title mb-0"><i class="fas fa-layer-group me-3"></i>{{ $title }}</h5>
                                 </button>
                             </h2>
                         </div>
@@ -51,16 +51,9 @@
             </div><!-- End Info Card -->
         </div>
     </div>
-
-    <a href="/shipments/create">
-        <button class="floating-add-button btn btn-warning text-light rounded-circle shadow-lg position-fixed">
-            <i class="fas fa-plus"></i>
-        </button>
-    </a>
 </div>
 @endsection
 
 @section('customScripts')
-<script src="{{ asset('dist/js/app/shipment.js') }}?v={{ config('asset.version') }}"></script>
-{{-- <script src="{{ asset('dist/js/validation/add-shipment.js') }}?v={{ config('asset.version') }}"></script> --}}
+<script src="{{ asset('dist/js/app/collection.js') }}?v={{ config('asset.version') }}"></script>
 @endsection

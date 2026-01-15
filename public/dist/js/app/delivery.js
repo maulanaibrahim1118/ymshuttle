@@ -83,7 +83,6 @@ function getFilterData() {
         category: $("#category").val(),
         sender: $("#sender").val(),
         destination: $("#destination").val(),
-        status: $("#status").val(),
         date: $("#date").val(),
     };
 }
@@ -98,7 +97,7 @@ function loadShipment(append = true) {
     currentSearch = searchVal;
 
     $.ajax({
-        url: "/ajax/list-shipments",
+        url: "/ajax/list-deliveries",
         data: {
             page: page,
             search: searchVal,
@@ -116,7 +115,7 @@ function loadShipment(append = true) {
                 const yesterdayKey = localDateKey(yesterdayDate);
 
                 res.data.forEach((item) => {
-                    const groupKey = localDateKey(item.created_at);
+                    const groupKey = localDateKey(item.ledger_created_at);
                     if (!groups[groupKey]) {
                         groups[groupKey] = [];
                         order.push(groupKey);
@@ -128,7 +127,7 @@ function loadShipment(append = true) {
 
                 order.forEach((groupKey) => {
                     const items = groups[groupKey];
-                    const firstDateObj = new Date(items[0].created_at);
+                    const firstDateObj = new Date(items[0].ledger_created_at);
 
                     let dateLabel;
                     if (groupKey === todayKey) dateLabel = "Today";
@@ -194,19 +193,19 @@ function loadShipment(append = true) {
                 } else {
                     finished = true;
                     $("#scrollSentinel").html(
-                        '<p class="text-muted mt-3">All shipments have been shown.</p>'
+                        '<p class="text-muted mt-3">All shipment deliveries have been shown.</p>'
                     );
                 }
             } else {
                 if (!append) {
                     $("#shipmentCards").html("");
                     $("#scrollSentinel").html(
-                        '<p class="text-muted mt-3">Shipment not found.</p>'
+                        '<p class="text-muted mt-3">Shipment delivery not found.</p>'
                     );
                 } else {
                     finished = true;
                     $("#scrollSentinel").html(
-                        '<p class="text-muted mt-3">No shipment available.</p>'
+                        '<p class="text-muted mt-3">No shipment delivery available.</p>'
                     );
                 }
             }
@@ -214,7 +213,7 @@ function loadShipment(append = true) {
             $("#searchShipment").show();
             $("#reloadShipment").show();
             $("#totalData").text(
-                `Total shipment(s): ${res.total ?? 0} ${
+                `Total shipment delivery(s): ${res.total ?? 0} ${
                     res.total >= 12 ? "(load per 12 rows)" : ""
                 }`
             );

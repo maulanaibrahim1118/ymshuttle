@@ -51,7 +51,9 @@
                 </button>
             </div>
 
+            @if (Request::segment(1) && !Request::segment(2))
             <div id="marginFloatingMenu" style="padding:27px 0px;" hidden></div>
+            @endif
 
             <footer class="footer" id="fade-in">
                 <div class="container-fluid d-flex justify-content-between">
@@ -65,6 +67,7 @@
                 </div>
             </footer>
 
+            @if (Request::segment(1) && !Request::segment(2))
             <div class="my-bottom-nav">
                 <a href="/home" class="my-nav-item {{ Request::is('home*') ? 'active' : '' }}">
                     <i class="fas fa-home"></i>
@@ -72,7 +75,7 @@
                 </a>
 
                 <a href="/shipments" class="my-nav-item {{ Request::is('shipments*') ? 'active' : '' }}">
-                    <i class="fas fa-truck"></i>
+                    <i class="fas fa-box"></i>
                     <span>Shipment</span>
                 </a>
 
@@ -93,6 +96,7 @@
                     <span>Logout</span>
                 </a>
             </div>
+            @endif
         </div>
     </div>
     

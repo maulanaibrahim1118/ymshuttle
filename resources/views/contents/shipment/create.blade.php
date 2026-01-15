@@ -32,9 +32,9 @@
                                 <option selected disabled></option>
                                 @foreach($locations as $location)
                                     @if(old('destination') == $location->code)
-                                    <option selected value="{{ $location->code }}">{{ strtoupper($location->name) }}</option>
+                                    <option selected value="{{ $location->code }}">{{ strtoupper($location->clean_name) }}</option>
                                     @else
-                                    <option value="{{ $location->code }}">{{ strtoupper($location->name) }}</option>
+                                    <option value="{{ $location->code }}">{{ strtoupper($location->clean_name) }}</option>
                                     @endif
                                 @endforeach
                             </select>
@@ -126,7 +126,7 @@
                             </div>
                         </div>
                         <div class="form-group col-md-6 mt-0">
-                            <label class="form-label">Shipment By*</label>
+                            <label class="form-label">Delivery By*</label>
                             <div id="shipmentGroup" class="selectgroup selectgroup-warning w-100">
                                 <label class="selectgroup-item">
                                     <input type="radio" name="shipment_by" value="1" class="selectgroup-input" />
@@ -181,5 +181,5 @@
 <script>
     var uoms = @json($uoms);
 </script>
-<script src="{{ asset('dist/js/validation/create-shipment.js') }}?v={{ config('asset.version') }}"></script>
+<script src="{{ asset('dist/js/validation/shipment-transaction.js') }}?v={{ config('asset.version') }}"></script>
 @endsection

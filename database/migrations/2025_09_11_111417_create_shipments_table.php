@@ -28,9 +28,9 @@ class CreateShipmentsTable extends Migration
             $table->enum('is_branch', ['0', '1']); // No, Yes
             $table->string('packing', 50)->nullable();
             $table->string('dc_support', 50)->nullable();
-            $table->enum('status', [0, 1, 2, 3, 4, 5, 6])->default(0); // Draft, New, Loading, Delivery, Delivered, Received, Cancelled
+            $table->enum('status', [1, 2, 3, 4, 5, 6])->default(1); // New, Loading, Delivery, Delivered, Cancelled
             $table->string('img_path', 255)->nullable();
-            $table->text('note')->nullable();
+            $table->text('notes')->nullable();
             $table->string('created_by', 40);
             $table->string('updated_by', 40);
             $table->timestamps();

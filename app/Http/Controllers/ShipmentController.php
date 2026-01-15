@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Location;
 use App\Shipment;
+use Carbon\Carbon;
+use App\Shipping_note;
 use App\Helpers\Cleaner;
 use App\Shipment_detail;
 use App\Shipment_ledger;
@@ -30,8 +32,7 @@ class ShipmentController extends Controller
         ];
 
         $data['categories'] = DB::table('categories')->select('id', 'name')->orderBy('name', 'ASC')->get();
-        $data['locations'] = DB::table('locations')
-            ->select('code', 'name')
+        $data['locations'] = Location::select('code', 'site', 'name')
             ->orderBy('name', 'ASC')
             ->get();
 
@@ -47,8 +48,8 @@ class ShipmentController extends Controller
         ];
 
         $data['categories'] = DB::table('categories')->select('id', 'name')->orderBy('name', 'ASC')->get();
-        $data['locations'] = DB::table('locations')
-            ->select('code', 'name')
+        $data['locations'] = Location::select('code', 'site', 'name')
+            ->whereNotIn('code', [Auth::user()->location_code])
             ->orderBy('name', 'ASC')
             ->get();
 
@@ -86,17 +87,19 @@ class ShipmentController extends Controller
             'packing', 'handling_level', 'shipment_by', 'notes'
         ]));
 
+        $senderLoc = Location::where('code', $sender)->first();
         $destinationLoc = Location::where('code', $cleaned['destination'])->first();
 
-        $isBranch   = 0;
         $dcSupport  = null;
 
         if ($destinationLoc) {
-            $area = strtoupper($destinationLoc->area ?? '');
+            $area = strtolower($destinationLoc->area);
 
-            // Kalau area bukan HO dan bukan DC → branch
-            if ($area !== 'ho' && $area !== 'dc') {
-                $isBranch  = 1;
+            if ($area == 'ho' || $area == 'dc') {
+                $isBranch  = 0;
+                $dcSupport = $senderLoc->dc_support ?? null;
+            } else {
+                $isBranch   = 1;
                 $dcSupport = $destinationLoc->dc_support ?? null;
             }
         }
@@ -115,7 +118,7 @@ class ShipmentController extends Controller
             'dc_support'        => $dcSupport,
             'status'            => 1,
             'img_path'          => null,
-            'note'              => $cleaned['notes'] ?? null,
+            'notes'             => $cleaned['notes'] ?? null,
             'created_by'        => $username,
             'updated_by'        => $username,
         ];
@@ -149,7 +152,7 @@ class ShipmentController extends Controller
                 'location_point'=> 'HQ',
                 'latitude'      => null,
                 'longitude'     => null,
-                'note'          => 'dibuat dan disiapkan oleh ' . ucwords($name),
+                'notes'         => 'dibuat dan disiapkan oleh ' . ucwords($name),
                 'img_path'      => null,
                 'created_by'    => $username,
                 'updated_by'    => $username,
@@ -180,17 +183,11 @@ class ShipmentController extends Controller
         }
     }
 
-    public function show($id)
+    private function getShipmentDetail($encryptedId)
     {
-        $data['title'] = "Shipment Details";
-        $data['breadcrumbs'] = [
-            ['label' => 'Shipment', 'url' => '/shipments' ],
-            ['label' => 'Details'],
-        ];
+        $id = decrypt($encryptedId);
 
-        $id = decrypt($id);
-        
-        $data['shipment'] = Shipment::with([
+        return Shipment::with([
             'category',
             'shipment_detail',
             'shipment_ledger',
@@ -198,35 +195,259 @@ class ShipmentController extends Controller
             'receiver_location',
             'creator'
         ])->findOrFail($id);
+    }
 
-        if ($data['shipment']->status == 1) {
-            $data['status'] = "Created";
-        } elseif ($data['shipment']->status == 2) {
-            $data['status'] = "Awaiting Payment";
-        } elseif ($data['shipment']->status == 3) {
-            $data['status'] = "On Delivery";
-        } elseif ($data['shipment']->status == 4) {
-            $data['status'] = "Delivered";
-        } elseif ($data['shipment']->status == 5) {
-            $data['status'] = "Finished";
-        } else {
-            $data['status'] = "Cancelled";
-        }
+    public function show($id)
+    {
+        $data['title'] = "Shipment Details";
+        $data['breadcrumbs'] = [
+            ['label' => 'Shipment', 'url' => '/shipments'],
+            ['label' => 'Details'],
+        ];
+
+        $user = auth()->user();
+
+        $shipment = $this->getShipmentDetail($id);
+
+        $isCollected = Shipment_ledger::where('no_shipment', $shipment->no_shipment)
+            ->where('status', '3')
+            ->where('created_by', $user->username)
+            ->exists();
+
+        $isSent = Shipment_ledger::where('no_shipment', $shipment->no_shipment)
+            ->where('status', '2')
+            ->where('created_by', $user->username)
+            ->exists();
+
+        $data['shippingNotes'] = Shipping_note::where('no_shipment', $shipment->no_shipment)->get();
 
         $qr = Builder::create()
             ->writer(new PngWriter())
-            ->data($data['shipment']->no_shipment)
+            ->data($shipment->no_shipment)
             ->size(300)
             ->margin(10)
-            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh()) // biar tahan gangguan logo besar
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->logoPath(public_path('dist/img/logoym.jpg'))
-            ->logoResizeToWidth(85) // besar, tapi masih aman
+            ->logoResizeToWidth(85)
             ->build();
 
-        // Buat QR Code Base64
         $data['qrCode'] = base64_encode($qr->getString());
 
+        $data['canCollect'] = in_array($shipment->status, ['2', '3'])
+            && $shipment->agent !== $user->username
+            && $shipment->shipment_by != 1
+            && $shipment->destination !== $user->location_code
+            && !$isCollected;
+
+        $data['canReceive'] = in_array($shipment->status, ['2', '3'])
+            && $shipment->destination === $user->location_code;
+
+        $data['canSend'] = (
+            $shipment->status == '1'
+            && $shipment->created_by === $user->username
+        ) || (
+            !$user->hasRole('user')
+            && $shipment->agent === $user->username
+            && !$isSent
+        );
+
+        $data['canDelete'] = $shipment->status == '1'
+            && $shipment->created_by === $user->username;
+
+        $data['shipment'] = $shipment;
+
         return view('contents.shipment.show', $data);
+    }
+
+    public function edit($id)
+    {
+        $data['title'] = "Edit Shipment";
+        $data['breadcrumbs'] = [
+            ['label' => 'Shipment', 'url' => '/shipments'],
+            ['label' => 'Edit'],
+        ];
+
+        // PAKAI QUERY YANG SAMA
+        $data['shipment'] = $this->getShipmentDetail($id);
+
+        $data['categories'] = DB::table('categories')
+            ->select('id', 'name')
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        $data['locations'] = DB::table('locations')
+            ->select('code', 'name')
+            ->whereNotIn('code', [Auth::user()->location_code])
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        $data['uoms'] = DB::table('uoms')
+            ->pluck('name')
+            ->sort()
+            ->values();
+
+        return view('contents.shipment.edit', $data);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user     = Auth::user();
+        $username = $user->username;
+        $name     = $user->name;
+        $sender   = $user->location->code;
+
+        $id = decrypt($id);
+
+        $shipment = Shipment::where('id', $id)
+            ->where('created_by', $username)
+            ->where('status', 1)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'sender_pic'        => 'required|string|max:50',
+            'destination'       => 'required|string|max:5',
+            'destination_pic'   => 'nullable|string|max:50',
+            'category_id'       => 'required|integer',
+            'packing'           => 'nullable|string|max:50',
+            'handling_level'    => 'required|in:1,2',
+            'shipment_by'       => 'required|in:1,2,3',
+            'items'             => 'required|array|min:1',
+            'items.*.name'      => 'required|string|max:50',
+            'items.*.label'     => 'nullable|string|max:50',
+            'items.*.condition' => 'required|string|max:10',
+            'items.*.qty'       => 'required|numeric|min:0.01',
+            'items.*.uom'       => 'required|string|max:15',
+            'notes'             => 'nullable|string|max:255',
+        ]);
+
+        $cleaned = Cleaner::cleanAll($request->only([
+            'sender_pic',
+            'destination',
+            'destination_pic',
+            'category_id',
+            'packing',
+            'handling_level',
+            'shipment_by',
+            'notes'
+        ]));
+
+        $senderLoc = Location::where('code', $sender)->first();
+        $destinationLoc = Location::where('code', $cleaned['destination'])->first();
+
+        $dcSupport = null;
+
+        if ($destinationLoc) {
+            $area = strtolower($destinationLoc->area);
+
+            if ($area == 'ho' || $area == 'dc') {
+                $isBranch  = 0;
+                $dcSupport = $senderLoc->dc_support ?? null;
+            } else {
+                $isBranch   = 1;
+                $dcSupport = $destinationLoc->dc_support ?? null;
+            }
+        }
+
+        $shipmentData = [
+            'description'       => 'Shipment to ' . ucwords($destinationLoc->name),
+            'category_id'       => $cleaned['category_id'],
+            'sender_pic'        => strtolower($cleaned['sender_pic']),
+            'destination'       => $cleaned['destination'],
+            'destination_pic'   => strtolower($cleaned['destination_pic'] ?? ''),
+            'packing'           => $cleaned['packing'],
+            'handling_level'    => $cleaned['handling_level'],
+            'shipment_by'       => $cleaned['shipment_by'],
+            'is_branch'         => $isBranch,
+            'dc_support'        => $dcSupport,
+            'notes'             => $cleaned['notes'] ?? null,
+            'updated_by'        => $username,
+        ];
+
+        try {
+            DB::beginTransaction();
+
+            // === UPDATE MAIN SHIPMENT ===
+            $shipment->update($shipmentData);
+
+            // === RESET ITEM DETAILS ===
+            Shipment_detail::where('no_shipment', $shipment->no_shipment)->delete();
+
+            foreach ($validated['items'] as $item) {
+                Shipment_detail::create([
+                    'no_shipment' => $shipment->no_shipment,
+                    'item_name'   => strtolower($item['name']),
+                    'label'       => strtolower($item['label']) ?? null,
+                    'condition'   => strtolower($item['condition']),
+                    'quantity'    => $item['qty'],
+                    'uom'         => strtolower($item['uom']),
+                    'created_by'  => $username,
+                    'updated_by'  => $username,
+                ]);
+            }
+
+            LogActivity::log(
+                'update-shipment',
+                "Successfully updated shipment {$shipment->no_shipment}",
+                '',
+                $username
+            );
+
+            DB::commit();
+            return redirect()->route('shipments.show', encrypt($shipment->id))->with('success', 'Shipment successfully updated!');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating shipment: ' . $e->getMessage());
+
+            LogActivity::log(
+                'update-shipment',
+                "Failed to update shipment {$shipment->no_shipment}",
+                $e->getMessage(),
+                $username
+            );
+
+            return redirect()->back()->with('error', 'Failed to update shipment!');
+        }
+    }
+
+    public function destroy($noShipment)
+    {
+        $user     = Auth::user();
+        $username = $user->username;
+        $noShipment = decrypt($noShipment);
+
+        $shipment = Shipment::where('no_shipment', $noShipment)->where('status', 1)->firstOrFail();
+
+        try {
+            DB::beginTransaction();
+
+            Shipment_ledger::where('no_shipment', $shipment->no_shipment)->delete();
+
+            Shipment_detail::where('no_shipment', $shipment->no_shipment)->delete();
+
+            $shipment->delete();
+
+            LogActivity::log(
+                'delete-shipment',
+                "Deleted shipment {$shipment->no_shipment}",
+                '',
+                $username
+            );
+
+            DB::commit();
+            return redirect()->route('shipments.index')->with('success', 'Shipment successfully deleted!');
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+            LogActivity::log(
+                'delete-shipment',
+                "Failed to delete shipment {$shipment->no_shipment}",
+                $e->getMessage(),
+                $username
+            );
+
+            return redirect()->back()->with('error', 'Failed to delete shipment!');
+        }
     }
 
     public function print($noShipment)
@@ -285,31 +506,138 @@ class ShipmentController extends Controller
         ]);
     }
 
+    public function send(Request $request, $noShipment)
+    {
+        $user = Auth::user();
+        $username = $user->username;
+        $name = ucwords($user->name);
+
+        $noShipment = decrypt($noShipment);
+
+        $shipment = Shipment::where('no_shipment', $noShipment)->firstOrFail();
+        $userLocation = Location::where('code', $user->location_code)->first();
+
+        $area = $userLocation->area ?? 'unknown';
+        $locPoint  = $userLocation->name;
+        $destination = null;
+        $status = 3;
+
+        // Jika pengiriman via personal / user sendiri
+        if ($shipment->shipment_by === '1') {
+            $destination = $shipment->receiver_location->name;
+
+        // Jika pengiriman via shuttle atau messenger
+        } else {
+            if ($area === 'ho') {
+                if ($user->hasRole('user')) {
+                    if ($shipment->shipment_by === '2') {
+                        $destination = 'transit griya center';
+                        $status = 2;
+                    } else {
+                        $destination = 'messenger';
+                        $status = 2;
+                    }
+                } elseif ($user->hasRole('agent')) {
+                    if ($shipment->is_branch === '1') {
+                        $destination = $shipment->dc_support === 'd53'
+                            ? 'DC 53'
+                            : 'DC Gedebage';
+                    } else {
+                        $destination = $shipment->receiver_location->name;
+                    }
+                }
+
+            } elseif ($area === 'dc') {
+
+                if ($user->hasRole('agent')) {
+
+                    if ($shipment->is_branch === '1') {
+                        $destination = $shipment->receiver_location->name;
+                    } else {
+                        $destination = 'griya center';
+                    }
+                }
+
+            } else {
+                if ($user->hasRole('user')) {
+                    $destination = $userLocation->dc_support === 'd53'
+                        ? 'DC 53'
+                        : 'DC Gedebage';
+                }
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if ($shipment->status == 1 || $shipment->status == 2) {
+                $shipment->update(['status' => $status, 'agent' => $username]);
+            } elseif ($shipment->status == 3) {
+                $shipment->update(['agent' => $username]);
+            }
+
+            Shipment_ledger::create([
+                'no_shipment'    => $noShipment,
+                'description'    => "Send to {$destination}",
+                'status'         => 2,
+                'status_actor'   => $username,
+                'location_point' => $locPoint,
+                'latitude'       => null,
+                'longitude'      => null,
+                'notes'          => "Dikirim oleh {$name}",
+                'img_path'       => null,
+                'created_by'     => $username,
+                'updated_by'     => $username,
+            ]);
+
+            if ($request->notes) {
+                Shipping_note::create([
+                    'no_shipment'   => $noShipment,
+                    'notes'         => "[send]: ".$request->notes,
+                    'created_by'    => $username,
+                    'updated_by'    => $username,
+                ]);
+            }
+
+            LogActivity::log('send-shipment', "Successfully send shipment: {$shipment->no_shipment}", '', $username);
+
+            DB::commit();
+
+            return back()->with('success', 'Shipment sent successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error sent shipment: ' . $e->getMessage());
+
+            LogActivity::log('send-shipment', "Failed to send shipment: {$noShipment}", $e->getMessage(), $username);
+
+            return back()->with('error', 'Failed to send shipment!');
+        }
+    }
+
     public function collect(Request $request, $noShipment)
     {
         $user = Auth::user();
         $username = $user->username;
         $name = ucwords($user->name);
 
-        $agentLoc = Location::where('code', $user->location_code)->first();
+        $userLoc = Location::where('code', $user->location_code)->first();
 
         $locPoint = null;
 
-        if ($agentLoc) {
-            $area = strtoupper($agentLoc->area ?? '');
-
-            // Kalau area bukan HO dan bukan DC → branch
-            if ($area !== 'ho') {
-                $locPoint  = "transit griya center";
-            } else {
-                $locPoint  = "transit {$agentLoc->name}";
+        if ($userLoc) {
+            $area = strtolower($userLoc->area);
+            
+            if ($user->hasRole('agent')) {
+                if ($area == 'ho') {
+                    $locPoint  = "at transit griya center";
+                } else {
+                    $locPoint  = "at transit {$userLoc->name}";
+                }
             }
-        }
-
-        $notes = null;
-
-        if ($request->notes) {
-            $notes = "dengan catatan: {$request->notes}";
+            
+            if ($user->hasRole('messenger')) {
+                $locPoint  = "by messenger";
+            }
         }
 
         try {
@@ -323,25 +651,40 @@ class ShipmentController extends Controller
                 throw new \Exception("Shipment not found: {$noShipment}");
             }
 
-            if ($shipment->status == 1) {
-                $shipment->update(['status' => 2, 'agent' => $username]);
-            } elseif ($shipment->status == 3) {
+            if ($shipment->destination == auth()->user()->location_code) {
+                $shipment->update(['status' => 5, 'agent' => $username]);
+                $ledgerStatus = 5;
+                $desc = "Shipment Received";
+                $codeAction = "[receive]";
+            } elseif ($shipment->status == 2 || $shipment->status == 3) {
                 $shipment->update(['agent' => $username]);
+                $ledgerStatus = 3;
+                $desc = "Collected {$locPoint}";
+                $codeAction = "[collect]";
             }
 
             Shipment_ledger::create([
                 'no_shipment'   => $noShipment,
-                'description'   => "Collected at {$locPoint}",
-                'status'        => 2,
+                'description'   => $desc,
+                'status'        => $ledgerStatus,
                 'status_actor'  => $username,
                 'location_point'=> $locPoint,
                 'latitude'      => null,
                 'longitude'     => null,
-                'note'          => "Diterima oleh {$name} {$notes}",
+                'notes'         => "Diterima oleh {$name}",
                 'img_path'      => null,
                 'created_by'    => $username,
                 'updated_by'    => $username,
             ]);
+
+            if ($request->notes) {
+                Shipping_note::create([
+                    'no_shipment'   => $noShipment,
+                    'notes'         => $codeAction.': '.$request->notes,
+                    'created_by'    => $username,
+                    'updated_by'    => $username,
+                ]);
+            }
 
             LogActivity::log(
                 'collect-shipment',
@@ -371,11 +714,13 @@ class ShipmentController extends Controller
     // Ajax Function
     public function list(Request $request)
     {
+        $user = Auth::user();
         $search = strtolower($request->input('search'));
         $categoryId = $request->input('category');
         $sender = $request->input('sender');
         $destination = $request->input('destination');
         $status = $request->input('status');
+        $date = $request->date ? Carbon::createFromFormat('d/m/Y', $request->date)->toDateString() : null;
 
         $baseQuery = Shipment::with(['category', 'sender_location', 'receiver_location', 'creator'])
             ->when($search, function ($q) use ($search) {
@@ -412,10 +757,20 @@ class ShipmentController extends Controller
             })
             ->when(isset($status), function ($q) use ($status) {
                 $q->where('status', $status);
+            })
+            ->when(isset($date), function ($q) use ($date) {
+                $q->whereDate('created_at', $date);
+            })
+            ->when(!$user->hasRole('super admin'), function ($q) use ($user) {
+                $q->where(function ($sub) use ($user) {
+                    $sub->where('sender', $user->location_code)
+                        ->orWhere('destination', $user->location_code);
+                });
             });
 
             $query = $baseQuery
                 ->orderBy(DB::raw('DATE(created_at)'), 'DESC')
+                ->orderBy('status', 'ASC')
                 ->paginate(12);
 
             $query->getCollection()->transform(function ($item) {

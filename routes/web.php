@@ -35,16 +35,26 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/master-categories/destroy/{id}', 'CategoryController@destroy')->name('categories.destroy')->middleware('permission:category-delete');
         Route::get('/ajax/check-unique-category-name', 'CategoryController@checkUniqueName')->middleware('permission:category-add|category-edit');
         Route::get('/ajax/master-categories/{id}/get-criterias', 'CategoryController@getCriterias')->middleware('permission:category-edit');
+        
+        Route::get('/shipments', 'ShipmentController@index')->name('shipments.index')->middleware('permission:shipment-view');
+        Route::get('/shipments/create', 'ShipmentController@create')->name('shipments.create')->middleware('permission:shipment-add');
+        Route::post('/shipments/store', 'ShipmentController@store')->name('shipments.store')->middleware('permission:shipment-add');
+        Route::get('/shipments/details/{id}', 'ShipmentController@show')->name('shipments.show')->middleware('permission:shipment-view');
+        Route::get('/shipments/edit/{id}', 'ShipmentController@edit')->name('shipments.edit')->middleware('permission:shipment-edit');
+        Route::put('/shipments/update/{id}', 'ShipmentController@update')->name('shipments.update')->middleware('permission:shipment-edit');
+        Route::delete('/shipments/destroy/{noShipment}', 'ShipmentController@destroy')->name('shipments.destroy')->middleware('permission:shipment-delete');
+        Route::get('/shipments/print/{noShipment}', 'ShipmentController@print')->name('shipments.print')->middleware('permission:shipment-print');
+        Route::get('/shipments/scan', 'ShipmentController@scanPage')->name('shipments.scan')->middleware('permission:shipment-view');
+        Route::post('/shipments/scan', 'ShipmentController@scanProcess')->name('shipments.scan.process')->middleware('permission:shipment-view');
+        Route::post('/shipments/collect/{noShipment}', 'ShipmentController@collect')->name('shipments.collect')->middleware('permission:shipment-collect');
+        Route::post('/shipments/send/{noShipment}', 'ShipmentController@send')->name('shipments.send')->middleware('permission:shipment-send');
+        Route::get('/ajax/list-shipments', 'ShipmentController@list')->name('shipments.list')->middleware('permission:shipment-view');
 
-        Route::get('/shipments', 'ShipmentController@index')->name('shipments.index');
-        Route::get('/shipments/create', 'ShipmentController@create')->name('shipments.create');
-        Route::post('/shipments/store', 'ShipmentController@store')->name('shipments.store');
-        Route::get('/shipments/details/{id}', 'ShipmentController@show')->name('shipments.show');
-        Route::get('/shipments/scan', 'ShipmentController@scanPage')->name('shipments.scan');
-        Route::post('/shipments/scan', 'ShipmentController@scanProcess')->name('shipments.scan.process');
-        Route::post('/shipments/collect/{noShipment}', 'ShipmentController@collect')->name('shipments.collect');
-        Route::get('/shipments/print/{noShipment}', 'ShipmentController@print')->name('shipments.print');
-        Route::get('/ajax/list-shipments', 'ShipmentController@list')->name('shipments.list');
+        Route::get('/collections', 'CollectionController@index')->name('collections.index')->middleware('permission:collection-view');
+        Route::get('/ajax/list-collections', 'CollectionController@list')->name('collections.list')->middleware('permission:collection-view');
+
+        Route::get('/deliveries', 'DeliveryController@index')->name('deliveries.index')->middleware('permission:delivery-view');
+        Route::get('/ajax/list-deliveries', 'DeliveryController@list')->name('deliveries.list')->middleware('permission:delivery-view');
 
         Route::get('/setting-users', 'UserController@index')->name('users.index')->middleware('permission:user-view');
         Route::get('/setting-users/list', 'UserController@list')->name('users.list')->middleware('permission:user-view');

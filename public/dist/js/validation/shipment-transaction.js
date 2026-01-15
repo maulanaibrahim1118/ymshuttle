@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("items_container");
-    let rowIdx = 1;
 
     document.getElementById("addRow").addEventListener("click", function () {
+        const uniqueKey = `new_${Date.now()}`;
+
         const newRow = document.createElement("div");
         newRow.classList.add("item-row", "border", "rounded", "p-3", "mb-2");
 
-        // bikin dropdown UOM dari array uoms global
         const uomOptions = uoms
             .map(
                 (uom) => `<option value="${uom}">${uom.toUpperCase()}</option>`
@@ -15,29 +15,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
         newRow.innerHTML = `
             <div class="row g-3 px-2">
-                <div class="col-12 col-md-4 px-2">
-                    <input type="text" name="items[${rowIdx}][name]" class="form-control text-uppercase alert-warning" placeholder="Item Name*" required>
+                <div class="col-md-4 px-2">
+                    <input type="text" name="items[${uniqueKey}][name]" class="form-control text-uppercase alert-warning" placeholder="Item Name*" required>
                 </div>
-                <div class="col-6 col-md-1 px-2">
-                    <input type="number" name="items[${rowIdx}][qty]" class="form-control text-uppercase alert-warning" placeholder="Qty*" required>
+
+                <div class="col-md-1 px-2">
+                    <input type="number" step="0.01" name="items[${uniqueKey}][qty]" class="form-control text-uppercase alert-warning" placeholder="Qty*" required>
                 </div>
-                <div class="col-6 col-md-2 px-2">
-                    <select name="items[${rowIdx}][uom]" class="form-select select2 alert-warning text-uppercase" required>
+
+                <div class="col-md-2 px-2">
+                    <select name="items[${uniqueKey}][uom]" class="form-control select2 alert-warning" required>
                         <option value="" disabled selected>UOM*</option>
                         ${uomOptions}
                     </select>
                 </div>
-                <div class="col-6 col-md-2 px-2">
-                    <select name="items[${rowIdx}][condition]" class="form-select select2 alert-warning text-uppercase" required>
+
+                <div class="col-md-2 px-2">
+                    <select name="items[${uniqueKey}][condition]" class="form-control select2 alert-warning" required>
                         <option value="" disabled selected>CONDITION*</option>
                         <option value="good">GOOD</option>
                         <option value="broken">BROKEN</option>
                     </select>
                 </div>
-                <div class="col-6 col-md-2 px-2">
-                    <input type="text" name="items[${rowIdx}][label]" class="form-control text-uppercase alert-warning" placeholder="No Label (optional)">
+
+                <div class="col-md-2 px-2">
+                    <input type="text" name="items[${uniqueKey}][label]" class="form-control text-uppercase alert-warning" placeholder="No Label (optional)">
                 </div>
-                <div class="col-12 col-md-1 px-2 d-flex justify-content-end">
+
+                <div class="col-md-1 px-2 d-flex justify-content-end">
                     <button type="button" class="btn btn-label-danger btn-sm deleteRow w-100">
                         <i class="fas fa-trash-alt me-1"></i> Delete
                     </button>
@@ -47,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         container.appendChild(newRow);
         initSelect2(newRow);
-        rowIdx++;
     });
 
     container.addEventListener("click", (e) => {
@@ -55,19 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const rows = container.querySelectorAll(".item-row");
             if (rows.length > 1) {
                 e.target.closest(".item-row").remove();
-            } else {
-                $.notify(
-                    {
-                        icon: "icon-bell",
-                        title: "Warning",
-                        message: "There must be at least 1 item!",
-                    },
-                    {
-                        type: "warning",
-                        placement: { from: "top", align: "right" },
-                        delay: 1000,
-                    }
-                );
             }
         }
     });

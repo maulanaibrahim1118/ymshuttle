@@ -17,8 +17,7 @@ class LocationController extends Controller
             ['label' => 'Location'],
         ];
 
-        $data['locations'] = DB::table('locations')
-            ->select('id', 'name')
+        $data['locations'] = Location::select('id', 'site', 'name')
             ->orderBy('name', 'ASC')
             ->get();
 
@@ -77,6 +76,9 @@ class LocationController extends Controller
         }
 
         return DataTables::of($query)
+            ->editColumn('name', function ($row) {
+                return strtoupper($row->clean_name);
+            })
             ->editColumn('created_by', function ($row) {
                 return strtoupper(optional($row->creator)->name ?? $row->created_by);
             })

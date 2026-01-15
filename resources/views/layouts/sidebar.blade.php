@@ -119,17 +119,26 @@
                 @can('shipment-view')
                 <li class="nav-item {{ Request::is('shipments*') ? 'active' : '' }}">
                     <a href="/shipments">
-                        <i class="fas fa-truck"></i>
+                        <i class="fas fa-box"></i>
                         <p>Shipment</p>
                     </a>
                 </li>
                 @endcan
                 
-                @can('receiving-view')
-                <li class="nav-item {{ Request::is('transfer*') ? 'active' : '' }}">
-                    <a href="/transfer">
-                        <i class="fas fa-box-open"></i>
-                        <p>Receiving</p>
+                @can('collection-view')
+                <li class="nav-item {{ Request::is('collections*') ? 'active' : '' }}">
+                    <a href="/collections">
+                        <i class="fas fa-layer-group"></i>
+                        <p>Collection</p>
+                    </a>
+                </li>
+                @endcan
+
+                @can('delivery-view')
+                <li class="nav-item {{ Request::is('deliveries*') ? 'active' : '' }}">
+                    <a href="/deliveries">
+                        <i class="fas fa-shipping-fast"></i>
+                        <p>Delivery</p>
                     </a>
                 </li>
                 @endcan

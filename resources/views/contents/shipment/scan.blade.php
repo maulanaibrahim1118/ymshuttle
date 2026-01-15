@@ -2,9 +2,23 @@
 
 @section('content')
 <div class="page-inner">
+    @include('layouts.breadcrumb')
+
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
+            <div class="card card-stats card-round">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <div class="row">
+                            <div class="col-7">
+                                <a href="javascript:history.back()">
+                                    <i class="fas fa-arrow-left"></i>
+                                </a>
+                                <span class="ms-4">{{ $title }}</span>
+                            </div>
+                        </div>
+                    </h5>
+                </div>
                 <div class="card-body text-center">
                     <h4 class="mb-3"><i class="fas fa-qrcode me-2"></i> Scan QR Shipment</h4>
 
@@ -14,8 +28,8 @@
                     <div class="my-3">
                         <h6 class="text-muted mb-3">or enter the shipment number manually</h6>
                         <div class="input-group" style="max-width: 400px; margin: 0 auto;">
-                            <input type="text" id="manualInput" class="form-control alert-warning text-center text-uppercase">
-                            <button id="manualSubmit" class="btn btn-warning text-light">
+                            <input type="text" id="manualInput" class="form-control alert-warning text-center text-uppercase" autofocus>
+                            <button id="manualSubmit" class="btn">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -91,13 +105,18 @@ document.addEventListener("DOMContentLoaded", async function() {
                 // pesan error disesuaikan
                 if (isManual) {
                     swal("Warning!", "Shipment number not found.", "warning", {
-                        timer: 3000,
+                        timer: 1500,
+                        button:false
                     });
+                    
+                    inputEl.value = "";
+                    inputEl.focus();
                     // manualError.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Shipment number not found.`;
                 } else {
                     setScannerColor("#FF0000");
                     swal("Warning!", "Invalid QR Code.", "warning", {
-                        timer: 3000,
+                        timer: 1500,
+                        button:false
                     });
                     // resultEl.innerHTML = `<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Invalid QR Code!</span>`;
                 }

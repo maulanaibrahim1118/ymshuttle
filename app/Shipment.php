@@ -25,6 +25,11 @@ class Shipment extends Model
         return $this->hasMany('App\Shipment_ledger', 'no_shipment', 'no_shipment');
     }
 
+    public function shipping_note()
+    {
+        return $this->hasMany('App\Shipping_note', 'no_shipment', 'no_shipment');
+    }
+
     public function sender_location()
     {
         return $this->belongsTo('App\Location', 'sender', 'code');
@@ -62,7 +67,7 @@ class Shipment extends Model
             return [
                 'class' => 'bg-info',
                 'icon'  => 'fas fa-box',
-                'label' => 'New'
+                'label' => 'Created'
             ];
         }
 
@@ -94,7 +99,7 @@ class Shipment extends Model
             return [
                 'class' => 'bg-success',
                 'icon'  => 'fas fa-box-open',
-                'label' => 'Finished'
+                'label' => 'Received'
             ];
         }
 
@@ -112,5 +117,16 @@ class Shipment extends Model
         $random = random_int(10000, 99999); // 5 digit acak
 
         return "{$prefix}{$datePart}{$random}";
+    }
+
+    const SHIPMENT_BY = [
+        1 => 'Personally',
+        2 => 'Shuttle',
+        3 => 'Messenger',
+    ];
+
+    public function getShipmentByLabelAttribute()
+    {
+        return self::SHIPMENT_BY[$this->shipment_by] ?? '-';
     }
 }

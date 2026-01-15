@@ -26,8 +26,16 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'category-delete']);
         
         Permission::create(['name' => 'shipment-view']);
+        Permission::create(['name' => 'shipment-add']);
+        Permission::create(['name' => 'shipment-edit']);
+        Permission::create(['name' => 'shipment-delete']);
+        Permission::create(['name' => 'shipment-print']);
+        Permission::create(['name' => 'shipment-collect']);
+        Permission::create(['name' => 'shipment-receive']);
+        Permission::create(['name' => 'shipment-send']);
 
-        Permission::create(['name' => 'receiving-view']);
+        Permission::create(['name' => 'collection-view']);
+        Permission::create(['name' => 'delivery-view']);
 
         Permission::create(['name' => 'user-view']);
         Permission::create(['name' => 'user-add']);
@@ -54,8 +62,16 @@ class RolePermissionSeeder extends Seeder
         $superadmin->givePermissionTo('category-delete');
         
         $superadmin->givePermissionTo('shipment-view');
+        $superadmin->givePermissionTo('shipment-add');
+        $superadmin->givePermissionTo('shipment-edit');
+        $superadmin->givePermissionTo('shipment-delete');
+        $superadmin->givePermissionTo('shipment-print');
+        $superadmin->givePermissionTo('shipment-collect');
+        $superadmin->givePermissionTo('shipment-receive');
+        $superadmin->givePermissionTo('shipment-send');
 
-        $superadmin->givePermissionTo('receiving-view');
+        $superadmin->givePermissionTo('collection-view');
+        $superadmin->givePermissionTo('delivery-view');
 
         $superadmin->givePermissionTo('user-view');
         $superadmin->givePermissionTo('user-add');

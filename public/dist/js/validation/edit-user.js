@@ -51,10 +51,10 @@ $(function () {
 
     function validateUsername() {
         let editUsername = $("#edit_username").val();
-        editUsername = filterNonNumericInput(editUsername);
+        // editUsername = filterNonNumericInput(editUsername);
         $("#edit_username").val(editUsername); // Update the input with filtered value
 
-        if (editUsername !== "" && /^[0-9a-zA-Z]{1,10}$/.test(editUsername)) {
+        if (editUsername !== "") {
             $.ajax({
                 url: "/ajax/check-unique-username",
                 type: "GET",
