@@ -501,13 +501,29 @@ class ShipmentController extends Controller
     public function scanProcess(Request $request)
     {
         $no_shipment = $request->input('no_shipment');
+        $user = Auth::user();
 
         $shipment = Shipment::where('no_shipment', $no_shipment)->first();
 
         if (!$shipment) {
-            return response()->json(['success' => false, 'message' => 'Invalid QR Code!']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid QR Code!'
+            ]);
         }
 
+        // jika bukan pembuat shipment DAN status masih 1 → tolak
+        if (
+            $user->username !== $shipment->created_by &&
+            (int) $shipment->status === 1
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Shipment is not available.'
+            ]);
+        }
+
+        // selain itu → tampilkan
         return response()->json([
             'success' => true,
             'redirect' => route('shipments.show', Crypt::encrypt($shipment->id))
