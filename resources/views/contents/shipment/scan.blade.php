@@ -118,6 +118,8 @@ document.addEventListener("DOMContentLoaded", async function() {
                         timer: 1500,
                         button:false
                     });
+
+                    inputEl.focus();
                     // resultEl.innerHTML = `<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Invalid QR Code!</span>`;
                 }
 
@@ -125,6 +127,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                     if (!isManual) {
                         resultEl.innerText = "";
                         setScannerColor("#00FF00");
+                        inputEl.focus();
                     }
                     scanCooldown = false;
                 }, 2000);
@@ -133,14 +136,17 @@ document.addEventListener("DOMContentLoaded", async function() {
         .catch(() => {
             if (isManual) {
                 manualError.innerHTML = `<i class="fas fa-times-circle me-2"></i>Failed to send data to the server.`;
+                inputEl.focus();
             } else {
                 setScannerColor("#FF0000");
                 resultEl.innerHTML = `<span class="text-danger">Failed to send data to the server.</span>`;
+                inputEl.focus();
             }
             setTimeout(() => {
                 if (!isManual) {
                     resultEl.innerText = "";
                     setScannerColor("#00FF00");
+                    inputEl.focus();
                 }
                 scanCooldown = false;
             }, 2000);
