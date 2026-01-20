@@ -28,8 +28,8 @@
                     <div class="my-3">
                         <h6 class="text-muted mb-3">or enter the shipment number manually</h6>
                         <div class="input-group" style="max-width: 400px; margin: 0 auto;">
-                            <input type="text" id="manualInput" class="form-control alert-warning text-center text-uppercase" autofocus>
-                            <button id="manualSubmit" class="btn">
+                            <input type="text" id="manualInput" class="form-control text-center text-uppercase" autofocus>
+                            <button id="manualSubmit" class="btn btn-primary">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>

@@ -23,7 +23,7 @@
                         <div class="accordion-item mx-2">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    <h5 class="card-title mb-0">Profile Picture</h5>
+                                    <h5 class="card-title mb-0"><i class="fas fa-user-circle me-2"></i>Profile Picture</h5>
                                 </button>
                             </h2>
                         </div>
@@ -62,7 +62,7 @@
                         <div class="accordion-item mx-2">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                    <h5 class="card-title mb-0">Account Information</h5>
+                                    <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>Account Information</h5>
                                 </button>
                             </h2>
                         </div>
@@ -77,12 +77,14 @@
                                 </div>
                                 <div class="col-4 col-md-3 col-form-label">
                                     <p class="fw-bold mb-0">Username</p>
+                                    <p class="fw-bold mb-0">Role</p>
                                     <p class="fw-bold mb-0">Location</p>
                                     <p class="fw-bold mb-0">Registered</p>
                                     <p class="fw-bold mb-0">Last Login</p>
                                 </div>
                                 <div class="col-8 col-md-6 col-form-label">
                                     <p class="mb-0">: {{ $user->username }}</p>
+                                    <p class="mb-0">: {{ ucwords(auth()->user()->getRoleNames()->first()) }}</p>
                                     <p class="mb-0">: {{ ucwords($user->location->name) }}</p>
                                     <p class="mb-0">: {{ \Carbon\Carbon::parse($user->created_at)->format('d-M-Y') }}</p>
                                     <p class="mb-0">: {{ \Carbon\Carbon::parse($user->last_login_at)->format('d-M-Y H:i:s') }}</p>
@@ -101,7 +103,7 @@
                         <div class="accordion-item mx-2">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
-                                    <h5 class="card-title mb-0">Change Password</h5>
+                                    <h5 class="card-title mb-0"><i class="fas fa-key me-2"></i>Change Password</h5>
                                 </button>
                             </h2>
                         </div>

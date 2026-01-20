@@ -89,8 +89,8 @@ class Shipment extends Model
 
         if ($this->status == '4') {
             return [
-                'class' => 'bg-primary',
-                'icon'  => 'fas fa-people-carry',
+                'class' => 'bg-success',
+                'icon'  => 'fas fa-check-circle',
                 'label' => 'Delivered'
             ];
         }

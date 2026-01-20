@@ -52,12 +52,12 @@ class UserController extends Controller
             'username' => strtolower($cleaned['username']),
             'name' => strtolower($cleaned['name']),
             'location_code' => $cleaned['location_code'],
-            'password' => Hash::make($cleaned['username']),
+            'password' => Hash::make(strtolower($cleaned['username'])),
             'is_active' => '1',
             'created_by' => $username,
             'updated_by' => $username,
         ];
-    
+
         try {
             DB::beginTransaction();
             $user = User::create($data);

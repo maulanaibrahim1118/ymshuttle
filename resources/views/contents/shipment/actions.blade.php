@@ -21,7 +21,7 @@
 @can('shipment-send')
 @if($canSend)
 <div class="px-3 pb-3 pt-1">
-    <button class="btn btn-primary rounded-3 w-100" data-bs-toggle="modal" data-bs-target="#sendModal">
+    <button class="btn btn-warning text-white rounded-3 w-100" data-bs-toggle="modal" data-bs-target="#sendModal">
         <i class="fas fa-shipping-fast me-2"></i> Send
     </button>
 </div>

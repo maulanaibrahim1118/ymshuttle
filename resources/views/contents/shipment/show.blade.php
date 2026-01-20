@@ -239,9 +239,9 @@
                                         @endforelse
                                     </div>
                                 </div>
-                                @include('contents.shipment.actions')
                             </div>
                         </div>
+                        @include('contents.shipment.actions')
                     </div>
                 </div>
             </div>
@@ -329,4 +329,13 @@ function openPrintPage(event, baseUrl) {
     modal.show();
 }
 </script>
+
+@role('messenger')
+<script>
+function previewSendImage(event) {
+    const img = document.getElementById('send-image-preview');
+    img.src = URL.createObjectURL(event.target.files[0]);
+}
+</script>
+@endrole
 @endsection

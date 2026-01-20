@@ -47,7 +47,7 @@
                             <option value="2">ON LOADING</option>
                             <option value="3">ON DELIVERY</option>
                             <option value="4">DELIVERED</option>
-                            <option value="5">CANCELLED</option>
+                            <option value="5">RECEIVED</option>
                         </select>
                     </div>
                     <div class="form-group col-md-3">

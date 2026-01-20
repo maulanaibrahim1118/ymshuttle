@@ -42,7 +42,7 @@
                                         switch ($log->status) {
                                             case '1': $icon = 'fa-box text-info'; break;
                                             case '2': $icon = 'fa-shipping-fast text-warning'; break;
-                                            case '3': $icon = 'fa-truck-loading text-secondary'; break;
+                                            case '3': $icon = 'fa-layer-group text-secondary'; break;
                                             case '4': $icon = 'fa-people-carry text-primary'; break;
                                             case '5': $icon = 'fa-box-open text-success'; break;
                                             case '6': $icon = 'fa-times text-danger'; break;
@@ -57,6 +57,14 @@
                                 <div class="timeline-content ps-3">
                                     <h6 class="fw-bolder mb-0 text-dark">{{ ucwords($log->description ?? '-') }}</h6>
                                     <p class="mt-0 mb-0 text-muted">{{ ucfirst($log->notes) }}</p>
+                                    
+                                    @if(!empty($log->img_path))
+                                        <a href="{{ asset('storage/' . $log->img_path) }}"
+                                        target="_blank" rel="noopener noreferrer"
+                                        class="d-inline-block mt-1 text-decoration-none fw-semibold text-primary">
+                                            <i class="fas fa-camera me-1"></i> Lihat bukti pengiriman
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -137,9 +145,32 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form action="{{ route('shipments.send', ['noShipment' => encrypt($shipment->no_shipment)]) }}" method="POST">
+            <form action="{{ route('shipments.send', ['noShipment' => encrypt($shipment->no_shipment)]) }}" method="POST"  enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
+                    @role('messenger')
+                    <div class="mb-3" >
+                        {{-- <label class="form-label fw-bold">
+                            <i class="fas fa-camera me-1"></i> Proof of Delivery
+                        </label> --}}
+
+                        <div class="image-upload border rounded text-center p-2" style="max-width: 100px;">
+                            <label style="cursor:pointer;">
+                                <input type="file"
+                                    name="delivery_image"
+                                    accept="image/jpeg,image/png"
+                                    capture="camera"
+                                    hidden
+                                    onchange="previewSendImage(event)">
+                                
+                                <img id="send-image-preview"
+                                    src="{{ asset('dist/img/img-plus.png') }}"
+                                    class="img-fluid rounded"
+                                    style="max-height:120px;">
+                            </label>
+                        </div>
+                    </div>
+                    @endrole
                     <div class="mb-3">
                         <textarea name="notes" id="notes" class="form-control" rows="5" placeholder="Add any notes ... (optional)"></textarea>
                     </div>

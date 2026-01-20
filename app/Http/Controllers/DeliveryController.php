@@ -43,7 +43,7 @@ class DeliveryController extends Controller
             ])
 
             // WAJIB: shipment sudah delivery / received
-            ->whereIn('status', ['3', '4'])
+            ->whereIn('status', ['3', '4', '5'])
 
             // WAJIB: ledger TERAKHIR status SEND (2) oleh user login
             ->whereHas('shipment_ledger', function ($q) use ($user, $date) {
