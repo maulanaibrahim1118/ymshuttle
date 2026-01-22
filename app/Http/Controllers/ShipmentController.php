@@ -12,12 +12,12 @@ use App\Shipment_detail;
 use App\Shipment_ledger;
 use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
-use App\Helpers\ImageCompressor;
 use Illuminate\Support\Facades\DB;
 use Endroid\QrCode\Builder\Builder;
 use Illuminate\Support\Facades\Log;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\ProcessShipmentImageJob;
 use Endroid\QrCode\Encoding\Encoding;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -97,6 +97,7 @@ class ShipmentController extends Controller
         $destinationLoc = Location::where('code', $cleaned['destination'])->first();
 
         $dcSupport  = null;
+        $isBranch  = 0;
 
         if ($destinationLoc) {
             $destinationArea = strtolower($destinationLoc->area);
@@ -112,12 +113,7 @@ class ShipmentController extends Controller
                     $isBranch   = 1;
                     $dcSupport = $destinationLoc->dc_support ?? null;
                 }
-                
-            } else {
-                if ($destinationArea == 'ho' || $destinationArea == 'dc') {
-                    $isBranch  = 0;
-                }
-            }
+            } 
         }
 
         $shipmentData = [
@@ -641,17 +637,20 @@ class ShipmentController extends Controller
             if ($user->hasRole('messenger') && $request->hasFile('delivery_image')) {
 
                 $year = now()->year;
-                $finalFilename = "shipments/{$year}/send_" . $noShipment . "_" . uniqid() . ".jpg";
+                $finalFilename = "shipments/{$year}/send_{$noShipment}_" . uniqid() . ".jpg";
 
-                // simpan ke temp dulu
                 $tempPath = $request->file('delivery_image')->store('temp');
 
-                // compress & simpan ke public
-                ImageCompressor::compressFromTemp(
+                // watermark text (sementara waktu saja)
+                $watermarkText = now()->format('d-m-Y H:i:s');
+
+                ProcessShipmentImageJob::dispatch(
                     $tempPath,
-                    $finalFilename
+                    $finalFilename,
+                    $watermarkText
                 );
 
+                // langsung simpan ke DB
                 $imgPath = $finalFilename;
             }
 

@@ -15,7 +15,7 @@ function renderCard(item) {
     } else if (item.status == "3") {
         badgeHtml = `<span class="badge bg-warning text-light"><i class="fas fa-shipping-fast"></i> On Delivery</span>`;
     } else if (item.status == "4") {
-        badgeHtml = `<span class="badge bg-primary"><i class="fas fa-people-carry"></i> Delivered</span>`;
+        badgeHtml = `<span class="badge bg-success"><i class="fas fa-check-circle"></i> Delivered</span>`;
     } else if (item.status == "5") {
         badgeHtml = `<span class="badge bg-success"><i class="fas fa-box-open"></i> Received</span>`;
     } else {

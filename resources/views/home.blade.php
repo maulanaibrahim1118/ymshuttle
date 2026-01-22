@@ -40,14 +40,14 @@
             $.notify({
                 icon: 'icon-check',
                 title: 'Hello, ' + userName,
-                message: 'Welcome back to the YMShuttle App!',
+                message: 'Great to see you again!',
             },{
                 type: 'success',
                 placement: {
                     from: "top",
                     align: "right"
                 },
-                delay: 10000,
+                delay: 2000,
             });
         });
     </script>

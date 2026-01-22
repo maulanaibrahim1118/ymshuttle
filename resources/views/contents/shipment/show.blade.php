@@ -146,8 +146,8 @@
                                 @if($shippingNotes->isNotEmpty())
                                 <div class="row px-4">
                                     @foreach($shippingNotes as $data)
-                                    <h6 class="fw-bolder mb-0">{{ ucwords($data->creator->name) }} <span class="text-muted fw-normal" style="font-size: 12px;"><i class="fas fa-clock ms-1"></i> {{ $data->created_at->format('d-m-Y H:i') }}</span></h6>
-                                    <p class="text-muted"><i class="fas fa-caret-right text-warning me-2"></i>{{ $data->notes }}</i></p>
+                                    <h6 class="fw-bolder mb-0">{{ ucwords($data->creator->name) }} <span class="text-muted fw-normal ms-1" style="font-size: 12px;">{{ $data->created_at->format('d-m-Y H:i') }}</span></h6>
+                                    <p><i class="fas fa-caret-right text-warning me-2"></i>{{ $data->notes }}</i></p>
                                     @endforeach
                                 </div>
                                 @else
@@ -327,6 +327,31 @@ function openPrintPage(event, baseUrl) {
 
     const modal = new bootstrap.Modal(document.getElementById('copiesModal'));
     modal.show();
+}
+
+function validateDeliveryImage() {
+    const input = document.querySelector('input[name="delivery_image"]');
+
+    if (input && input.hasAttribute('required')) {
+        if (!input.checkValidity()) {
+            $.notify({
+                icon: 'icon-bell',
+                title: 'Warning!',
+                message: 'Please capture an image.',
+            },{
+                type: 'warning',
+                placement: {
+                    from: "top",
+                    align: "right"
+                },
+                delay: 2000,
+                z_index: 2000
+            });
+            return false; // STOP submit
+        }
+    }
+
+    return true; // lanjut submit
 }
 </script>
 

@@ -71,11 +71,11 @@ class LoginController extends Controller
     {
         $username = $request->input($this->username());
 
-        LogActivity::log('user-login', 'User login failed', 'The provided credentials do not match our records.', $username);
+        LogActivity::log('user-login', 'User login failed', 'Invalid username or password.', $username);
 
         return redirect()->route('login')
             ->withInput($request->only($this->username(), 'remember'))
-            ->with('error', 'The provided credentials do not match our records.');
+            ->with('error', 'Invalid username or password.');
     }
 
     /**
@@ -116,7 +116,7 @@ class LoginController extends Controller
 
         LogActivity::log('user-login', 'User login successfully', '', Auth::user()->username);
 
-        $request->session()->flash('loginSuccess', 'Welcome back to the YDC App!');
+        $request->session()->flash('loginSuccess', 'Welcome back to the YMShuttle App!');
 
         return $this->authenticated($request, $this->guard()->user())
             ?: redirect()->intended($this->redirectPath());

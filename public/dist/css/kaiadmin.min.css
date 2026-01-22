@@ -10472,7 +10472,27 @@ table.table-sm tr table.table-sm td {
     .floating-add-button {
         bottom: 110px;
     }
+    .alert[data-notify="container"] {
+        padding: 8px 12px;
+        font-size: 12px;
+        min-width: 220px;
+        max-width: 310px;
+    }
+    .alert [data-notify="title"] {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+    .alert [data-notify="message"] {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+    .alert [data-notify="icon"] {
+        font-size: 14px;
+        margin-right: 6px;
+    }
 }
+
 #loadingOverlay {
     display: none;
     position: fixed;

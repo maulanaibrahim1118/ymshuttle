@@ -19,6 +19,10 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+Route::get('/gd-info', function () {
+    phpinfo();
+});
+
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/account-setting', 'AccountController@index')->name('account.index');
     Route::post('/password-change', 'AccountController@changePassword')->name('password.change');

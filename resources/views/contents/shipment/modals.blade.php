@@ -148,18 +148,14 @@
             <form action="{{ route('shipments.send', ['noShipment' => encrypt($shipment->no_shipment)]) }}" method="POST"  enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
-                    @role('messenger')
-                    <div class="mb-3" >
-                        {{-- <label class="form-label fw-bold">
-                            <i class="fas fa-camera me-1"></i> Proof of Delivery
-                        </label> --}}
-
+                    <div class="mb-3 {{ auth()->user()->hasRole('messenger') ? '' : 'd-none' }}">
                         <div class="image-upload border rounded text-center p-2" style="max-width: 100px;">
                             <label style="cursor:pointer;">
                                 <input type="file"
                                     name="delivery_image"
                                     accept="image/jpeg,image/png"
                                     capture="camera"
+                                    {{ auth()->user()->hasRole('messenger') ? 'required' : '' }}
                                     hidden
                                     onchange="previewSendImage(event)">
                                 
@@ -170,14 +166,13 @@
                             </label>
                         </div>
                     </div>
-                    @endrole
                     <div class="mb-3">
                         <textarea name="notes" id="notes" class="form-control" rows="5" placeholder="Add any notes ... (optional)"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light btn-round" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-label-primary btn-round">
+                    <button type="submit" class="btn btn-label-primary btn-round" onclick="return validateDeliveryImage()">
                         <i class="fab fa-telegram-plane me-1"></i> Submit
                     </button>
                 </div>
