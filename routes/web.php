@@ -50,7 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/shipments/print/{noShipment}', 'ShipmentController@print')->name('shipments.print')->middleware('permission:shipment-print');
         Route::get('/shipments/scan', 'ShipmentController@scanPage')->name('shipments.scan')->middleware('permission:shipment-view');
         Route::post('/shipments/scan', 'ShipmentController@scanProcess')->name('shipments.scan.process')->middleware('permission:shipment-view');
-        Route::post('/shipments/collect/{noShipment}', 'ShipmentController@collect')->name('shipments.collect')->middleware('permission:shipment-collect');
+        Route::post('/shipments/collect/{noShipment}', 'ShipmentController@collect')->name('shipments.collect')->middleware('permission:shipment-collect|shipment-receive');
         Route::post('/shipments/send/{noShipment}', 'ShipmentController@send')->name('shipments.send')->middleware('permission:shipment-send');
         Route::get('/ajax/list-shipments', 'ShipmentController@list')->name('shipments.list')->middleware('permission:shipment-view');
 

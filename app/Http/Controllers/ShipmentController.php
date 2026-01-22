@@ -726,6 +726,10 @@ class ShipmentController extends Controller
             if ($user->hasRole('messenger')) {
                 $locPoint  = "by messenger";
             }
+
+            if ($user->hasRole('user')) {
+                $locPoint  = "by {$userLoc->name}";
+            }
         }
 
         try {
