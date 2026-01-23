@@ -61,6 +61,8 @@ class ShipmentController extends Controller
 
         $data['uoms'] = DB::table('uoms')->pluck('name')->sort()->values();
 
+        $data['shipment'] = [];
+
         return view('contents.shipment.create', $data);
     }
 
@@ -471,6 +473,40 @@ class ShipmentController extends Controller
 
             return redirect()->back()->with('error', 'Failed to delete shipment!');
         }
+    }
+
+    public function copy($noShipment)
+    {
+        $data['title'] = "Copy Shipment";
+        $data['breadcrumbs'] = [
+            ['label' => 'Shipment', 'url' => '/shipments'],
+            ['label' => 'Copy'],
+        ];
+
+        $user = Auth::user();
+        $userLocation = Location::where('code', $user->location_code)->first();
+        $data['area'] = $userLocation->area ?? 'unknown';
+
+        $shipment = Shipment::where('no_shipment', $noShipment)->firstOrFail();
+
+        $data['shipment'] = $this->getShipmentDetail(encrypt($shipment->id));
+
+        $data['categories'] = DB::table('categories')
+            ->select('id', 'name')
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        $data['locations'] = Location::select('code', 'site', 'name')
+            ->orderBy('name', 'ASC')
+            ->whereNotIn('code', [Auth::user()->location_code])
+            ->get();
+
+        $data['uoms'] = DB::table('uoms')
+            ->pluck('name')
+            ->sort()
+            ->values();
+
+        return view('contents.shipment.create', $data);
     }
 
     public function print($noShipment)

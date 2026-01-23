@@ -47,6 +47,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/shipments/edit/{id}', 'ShipmentController@edit')->name('shipments.edit')->middleware('permission:shipment-edit');
         Route::put('/shipments/update/{id}', 'ShipmentController@update')->name('shipments.update')->middleware('permission:shipment-edit');
         Route::delete('/shipments/destroy/{noShipment}', 'ShipmentController@destroy')->name('shipments.destroy')->middleware('permission:shipment-delete');
+        Route::get('/shipments/copy/{noShipment}', 'ShipmentController@copy')->name('shipments.copy')->middleware('permission:shipment-add');
         Route::get('/shipments/print/{noShipment}', 'ShipmentController@print')->name('shipments.print')->middleware('permission:shipment-print');
         Route::get('/shipments/scan', 'ShipmentController@scanPage')->name('shipments.scan')->middleware('permission:shipment-view');
         Route::post('/shipments/scan', 'ShipmentController@scanProcess')->name('shipments.scan.process')->middleware('permission:shipment-view');

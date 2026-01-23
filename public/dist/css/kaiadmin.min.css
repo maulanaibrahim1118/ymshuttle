@@ -10475,8 +10475,6 @@ table.table-sm tr table.table-sm td {
     .alert[data-notify="container"] {
         padding: 8px 12px;
         font-size: 12px;
-        min-width: 220px;
-        max-width: 310px;
     }
     .alert [data-notify="title"] {
         font-size: 13px;

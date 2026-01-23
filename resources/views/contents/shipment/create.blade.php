@@ -17,7 +17,7 @@
                             <div class="row">
                                 <div class="form-group col-md-4 ">
                                     <label for="sender" class="form-label">Sender*</label>
-                                    <input type="text" name="sender" class="form-control text-uppercase alert-warning" id="sender" value="{{ old('sender', auth()->user()->name) }}" disabled>
+                                    <input type="text" name="sender" class="form-control text-uppercase alert-warning" id="sender" value="{{ old('sender', auth()->user()->location->name) }}" disabled>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="sender_pic" class="form-label">Sender PIC*</label>
@@ -48,11 +48,10 @@
                             <select name="category_id" class="form-select select2 alert-warning" id="category_id" required>
                                 <option selected disabled></option>
                                 @foreach($categories as $category)
-                                    @if(old('category_id') == $category->id)
-                                    <option selected value="{{ $category->id }}">{{ strtoupper($category->name) }}</option>
-                                    @else
-                                    <option value="{{ $category->id }}">{{ strtoupper($category->name) }}</option>
-                                    @endif
+                                    <option value="{{ $category->id }}"
+                                        {{ old('category_id', $shipment->category_id ?? '') == $category->id ? 'selected' : '' }}>
+                                        {{ strtoupper($category->name) }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -63,48 +62,78 @@
 
                         <div class="form-group pt-0 mt-3">
                             <div id="items_container">
-                                <!-- First item row -->
+                                @foreach(old('items', $shipment->shipment_detail ?? []) as $i => $item)
                                 <div class="item-row border rounded p-3 mb-2">
+                                    <input type="hidden"
+                                        name="items[{{ $i }}][id]"
+                                        value="{{ is_array($item) ? ($item['id'] ?? '') : $item->id }}">
+
                                     <div class="row g-3 px-2">
-                                        <div class="col-12 col-md-4 px-2">
-                                            <input type="text" name="items[0][name]" class="form-control text-uppercase alert-warning" placeholder="Item Name*" required>
+                                        <div class="col-md-4 px-2">
+                                            <input type="text"
+                                                name="items[{{ $i }}][name]"
+                                                placeholder="Item Name*"
+                                                class="form-control text-uppercase alert-warning"
+                                                value="{{ is_array($item) ? $item['name'] : $item->item_name }}"
+                                                required>
                                         </div>
-                                        <div class="col-6 col-md-1 px-2">
-                                            <input type="number" name="items[0][qty]" class="form-control text-uppercase alert-warning" placeholder="Qty*" required>
+
+                                        <div class="col-md-1 px-2">
+                                            <input type="number"
+                                                step="0.01"
+                                                name="items[{{ $i }}][qty]"
+                                                class="form-control alert-warning"
+                                                placeholder="Qty*"
+                                                value="{{ is_array($item) ? $item['quantity'] : $item->quantity }}"
+                                                required>
                                         </div>
-                                        <div class="col-6 col-md-2 px-2">
-                                            <select name="items[0][uom]" class="form-control select2 alert-warning text-uppercase" required>
-                                                <option value="" disabled selected>UOM*</option>
+
+                                        <div class="col-md-2 px-2">
+                                            <select name="items[{{ $i }}][uom]" class="form-control select2 alert-warning" required>
                                                 @foreach($uoms as $uom)
-                                                <option value="{{ $uom }}">{{ strtoupper($uom) }}</option>
+                                                    <option value="{{ $uom }}"
+                                                        {{ (is_array($item) ? $item['uom'] : $item->uom) == $uom ? 'selected' : '' }}>
+                                                        {{ strtoupper($uom) }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-6 col-md-2 px-2">
-                                            <select name="items[0][condition]" class="form-control select2 alert-warning text-uppercase" required>
-                                                <option value="" disabled selected>CONDITION*</option>
-                                                <option value="good">GOOD</option>
-                                                <option value="broken">BROKEN</option>
+
+                                        <div class="col-md-2 px-2">
+                                            <select name="items[{{ $i }}][condition]" class="form-control select2 alert-warning" required>
+                                                <option value="good" {{ (is_array($item) ? $item['condition'] : $item->condition) == 'good' ? 'selected' : '' }}>GOOD</option>
+                                                <option value="broken" {{ (is_array($item) ? $item['condition'] : $item->condition) == 'broken' ? 'selected' : '' }}>BROKEN</option>
                                             </select>
                                         </div>
-                                        <div class="col-6 col-md-2 px-2">
-                                            <input type="text" name="items[0][label]" class="form-control text-uppercase alert-warning" placeholder="No Label (optional)">
+
+                                        <div class="col-md-2 px-2">
+                                            <input type="text"
+                                                name="items[{{ $i }}][label]"
+                                                class="form-control text-uppercase alert-warning"
+                                                placeholder="No Label (optional)"
+                                                value="{{ is_array($item) ? $item['label'] : $item->label }}">
                                         </div>
-                                        <div class="col-12 col-md-1 px-2 d-flex justify-content-end">
-                                            <button type="button" class="btn btn-label-danger btn-sm deleteRow w-100"><i class="fas fa-trash-alt me-1"></i> Delete</button>
+
+                                        <div class="col-md-1 px-2 d-flex justify-content-end">
+                                            <button type="button" class="btn btn-label-danger btn-sm deleteRow w-100">
+                                                <i class="fas fa-trash-alt me-1"></i> Delete
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
+                                @endforeach
                             </div>
 
-                            <button type="button" id="addRow" class="btn btn-label-primary btn-sm mt-2"><i class="fas fa-plus me-1"></i> Add Item</button>
+                            <button type="button" id="addRow" class="btn btn-label-primary btn-sm mt-2">
+                                <i class="fas fa-plus me-1"></i> Add Item
+                            </button>
 
                             <div class="border-top my-3"></div>
 
                             <div class="form-group col-md-2 py-0">
                                 <label class="form-label">Item Packing</label>
                                 <div class="input-group mb-3">
-                                    <input type="number" name="packing" id="packing" class="form-control alert-warning"/>
+                                    <input type="number" name="packing" class="form-control alert-warning" value="{{ old('packing', $shipment->packing ?? '') }}">
                                     <span class="input-group-text" id="basic-addon2"><i class="fas fa-box me-2"></i> Carton</span>
                                 </div>
                             </div>
@@ -116,36 +145,47 @@
                             <label class="form-label">Handling Level*</label>
                             <div id="handlingGroup" class="selectgroup w-100">
                                 <label class="selectgroup-item">
-                                    <input type="radio" name="handling_level" value="1" class="selectgroup-input" />
-                                    <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-check-circle me-2"></i>Normal</span>
+                                    <input type="radio" name="handling_level" value="1" class="selectgroup-input" {{ old('handling_level', $shipment->handling_level ?? '') == 1 ? 'checked' : '' }} />
+                                    <span class="selectgroup-button selectgroup-button-icon">
+                                        <i class="fas fa-check-circle me-2"></i>Normal
+                                    </span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="radio" name="handling_level" value="2" class="selectgroup-input" />
-                                    <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-exclamation-triangle me-2"></i>Fragile</span>
+                                    <input type="radio" name="handling_level" value="2" class="selectgroup-input" {{ old('handling_level', $shipment->handling_level ?? '') == 2 ? 'checked' : '' }} />
+                                    <span class="selectgroup-button selectgroup-button-icon">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Fragile
+                                    </span>
                                 </label>
                             </div>
                         </div>
+
                         <div class="form-group col-md-6 mt-0">
                             <label class="form-label">Delivery By*</label>
                             <div id="shipmentGroup" class="selectgroup selectgroup-warning w-100">
                                 <label class="selectgroup-item">
-                                    <input type="radio" name="shipment_by" value="1" class="selectgroup-input" />
-                                    <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-user me-2"></i>Personally</span>
-                                </label>
-                                <label class="selectgroup-item">
-                                    <input type="radio" name="shipment_by" value="2" class="selectgroup-input" />
-                                    <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-truck me-2"></i>Shuttle</span>
+                                    <input type="radio" name="shipment_by" value="1" class="selectgroup-input" {{ old('shipment_by', $shipment->shipment_by ?? '') == 1 ? 'checked' : '' }} />
+                                    <span class="selectgroup-button selectgroup-button-icon">
+                                        <i class="fas fa-user me-2"></i>Personally
+                                    </span>
                                 </label>
                                 <label class="selectgroup-item" {{ $area == 'ho' ? '' : 'hidden' }}>
-                                    <input type="radio" name="shipment_by" value="3" class="selectgroup-input" />
-                                    <span class="selectgroup-button selectgroup-button-icon"><i class="fas fa-user-secret me-2"></i>Messenger</span>
+                                    <input type="radio" name="shipment_by" value="2" class="selectgroup-input" {{ old('shipment_by', $shipment->shipment_by ?? '') == 2 ? 'checked' : '' }} />
+                                    <span class="selectgroup-button selectgroup-button-icon">
+                                        <i class="fas fa-truck me-2"></i>Shuttle
+                                    </span>
+                                </label>
+                                <label class="selectgroup-item">
+                                    <input type="radio" name="shipment_by" value="3" class="selectgroup-input" {{ old('shipment_by', $shipment->shipment_by ?? '') == 3 ? 'checked' : '' }} />
+                                    <span class="selectgroup-button selectgroup-button-icon">
+                                        <i class="fas fa-user-secret me-2"></i>Messenger
+                                    </span>
                                 </label>
                             </div>
                         </div>
 
                         <div class="form-group col-md-12 mt-0">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea name="notes" class="form-control text-uppercase alert-warning" id="notes" value="{{ old('notes') }}" rows="5"></textarea>
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control text-uppercase alert-warning" rows="5">{{ old('notes', $shipment->notes ?? '') }}</textarea>
                         </div>
 
                         <div class="col-md-12">

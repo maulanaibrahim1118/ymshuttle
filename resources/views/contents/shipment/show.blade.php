@@ -49,16 +49,18 @@
                                 </div>
                                 <div class="col-3 col-md-2 ps-0 text-end">
                                     <img class="w-100 cursor-pointer" id="qrThumbnail" src="data:image/png;base64,{{ $qrCode }}" alt="QR Code">
-                                    @if(auth()->user()->username == $shipment->created_by)
-                                    <div class="text-center mt-2">
+                                    <div class="text-center mt-2 d-flex gap-1">
+                                        <a href="{{ route('shipments.copy', $shipment->no_shipment) }}"
+                                            class="btn btn-sm btn-label-primary btn-round fw-bold w-50" title="Copy">
+                                            <i class="fas fa-copy"></i>
+                                        </a>
                                         <a href="{{ route('shipments.print', $shipment->no_shipment) }}"
                                             target="_blank"
                                             onclick="openPrintPage(event, '{{ route('shipments.print', $shipment->no_shipment) }}')"
-                                            class="btn btn-sm btn-label-primary btn-round fw-bold w-100">
-                                            <i class="fas fa-print me-2"></i>Print
+                                            class="btn btn-sm btn-label-success btn-round fw-bold w-50" title="Print">
+                                            <i class="fas fa-print"></i>
                                         </a>
                                     </div>
-                                    @endif
                                 </div>
                             </div>
 
