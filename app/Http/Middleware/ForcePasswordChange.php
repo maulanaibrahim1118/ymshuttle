@@ -17,7 +17,7 @@ class ForcePasswordChange
     public function handle($request, Closure $next)
     {
         if (Auth::check() && is_null(Auth::user()->password_changed_at)) {
-            return redirect()->route('account.index')->with('warning', 'Change your password before continuing!');
+            return redirect()->route('account.index')->with('warning', 'Change your password now!');
         }
 
         return $next($request);
